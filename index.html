@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestiona+ — Nómina (Demo)</title>
+<meta name="theme-color" content="#1B2A4A">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy-900:#0f1c30;--navy-800:#1B2A4A;--navy-700:#243558;--navy-600:#2e4270;--navy-100:#edf1f9;--navy-50:#f5f7fb;
+  --crimson:#c0272d;--crimson-dark:#9a1e23;--crimson-bg:#fdf0f0;
+  --bg:#f0f3f8;--surface:#ffffff;--border:#dde4ef;--border-mid:#c4cedf;
+  --text-1:#1a2540;--text-2:#4a5878;--text-3:#8896b0;
+  --green:#1d7a4f;--green-bg:#e8f5ee;--red:#b83232;--red-bg:#fceaea;--amber:#9a5e10;--amber-bg:#fef5e7;--purple:#5b3ea8;--purple-bg:#f0ecfb;
+  --r-sm:4px;--r:10px;--r-lg:14px;--r-xl:18px;
+  --sh-sm:0 1px 4px rgba(27,42,74,0.08);--sh:0 2px 10px rgba(27,42,74,0.10);--sh-lg:0 6px 28px rgba(27,42,74,0.14);
+  --font:'DM Sans',system-ui,sans-serif;--ease:all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text-1);font-family:var(--font);font-size:14px;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.hidden{display:none!important;}
+.w-full{width:100%;}
+.btn{padding:.48rem 1.05rem;border:1px solid transparent;border-radius:var(--r-sm);cursor:pointer;font-family:var(--font);font-weight:500;font-size:.82rem;transition:var(--ease);display:inline-flex;align-items:center;justify-content:center;gap:.35rem;white-space:nowrap;line-height:1;text-decoration:none;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--navy-800);color:#fff;border-color:var(--navy-800);box-shadow:0 1px 5px rgba(27,42,74,.3);}
+.btn-primary:hover{background:var(--navy-700);border-color:var(--navy-700);}
+.btn-accent{background:var(--crimson);color:#fff;border-color:var(--crimson);font-weight:600;box-shadow:0 1px 5px rgba(192,39,45,.3);}
+.btn-accent:hover{background:var(--crimson-dark);border-color:var(--crimson-dark);}
+.btn-secondary{background:var(--surface);color:var(--text-2);border-color:var(--border-mid);}
+.btn-secondary:hover{background:var(--navy-100);color:var(--text-1);}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-success:hover{background:#165e3b;}
+.btn-danger{background:transparent;color:var(--red);border-color:rgba(184,50,50,.25);}
+.btn-danger:hover{background:var(--red-bg);border-color:var(--red);}
+.btn-warning{background:var(--amber-bg);color:var(--amber);border-color:rgba(154,94,16,.2);font-size:.78rem;}
+.btn-warning:hover{background:#fdebd0;}
+.btn-sm{padding:.3rem .7rem;font-size:.75rem;}
+.btn-icon{width:28px;height:28px;padding:0;border-radius:50%;}
+.form-group{margin-bottom:.95rem;}
+.form-group label{display:block;margin-bottom:.3rem;font-size:.72rem;font-weight:600;color:var(--text-2);letter-spacing:.05em;text-transform:uppercase;}
+.form-control{width:100%;padding:.58rem .8rem;background:var(--surface);border:1px solid var(--border-mid);border-radius:var(--r-sm);color:var(--text-1);font-family:var(--font);font-size:.875rem;-webkit-appearance:none;}
+.form-control:focus{outline:none;border-color:var(--navy-600);box-shadow:0 0 0 3px rgba(27,42,74,.1);}
+select.form-control{cursor:pointer;}
+textarea.form-control{resize:vertical;min-height:70px;}
+#login-view{min-height:100vh;display:flex;justify-content:center;align-items:center;background:var(--navy-900);position:relative;overflow:hidden;}
+#login-view::before{content:'';position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(192,39,45,.06) 0%,transparent 70%);top:-200px;right:-200px;}
+#login-view::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(46,66,112,.4) 0%,transparent 70%);bottom:-150px;left:-100px;}
+.login-card{background:var(--surface);border-radius:var(--r-xl);padding:2.5rem 2rem;width:100%;max-width:420px;margin:1rem;box-shadow:0 24px 80px rgba(0,0,0,.35);position:relative;z-index:1;}
+.login-header{text-align:center;margin-bottom:1.5rem;}
+.login-brand-block{display:inline-flex;align-items:center;gap:.4rem;background:var(--navy-800);color:#fff;padding:.55rem 1.4rem;border-radius:var(--r);margin-bottom:.85rem;}
+.login-brand-block .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--crimson);}
+.login-brand-text{font-size:1.3rem;font-weight:700;letter-spacing:.04em;}
+.login-sub{font-size:.75rem;color:var(--text-3);letter-spacing:.07em;text-transform:uppercase;}
+.demo-badge{display:inline-block;background:var(--crimson-bg);color:var(--crimson);border:1px solid rgba(192,39,45,.2);border-radius:999px;padding:.2rem .7rem;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;}
+.login-divider{height:1px;background:var(--border);margin:1.4rem 0;}
+.role-btn{display:flex;align-items:center;gap:.85rem;width:100%;padding:1rem 1.1rem;border-radius:var(--r-lg);border:2px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;transition:var(--ease);margin-bottom:.8rem;}
+.role-btn:hover{border-color:var(--navy-800);box-shadow:var(--sh);transform:translateY(-1px);}
+.role-btn .ri{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.role-btn.admin .ri{background:var(--navy-800);}
+.role-btn.tech .ri{background:var(--crimson);}
+.role-btn .rt{font-weight:700;color:var(--text-1);font-size:.92rem;}
+.role-btn .rs{font-size:.76rem;color:var(--text-3);margin-top:.1rem;}
+header{background:var(--navy-800);padding:0 1.5rem;height:60px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(15,28,48,.4);}
+.header-left{display:flex;align-items:center;gap:.9rem;}
+.header-brand{font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.03em;}
+.header-brand em{font-style:normal;color:var(--crimson);}
+.header-sep{width:1px;height:18px;background:rgba(255,255,255,.15);}
+.header-tag{font-size:.7rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.09em;}
+.user-info{display:flex;align-items:center;gap:.65rem;}
+.user-chip{display:flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:.22rem .7rem .22rem .28rem;}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:var(--crimson);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;}
+#user-display-name{font-size:.78rem;color:rgba(255,255,255,.8);font-weight:500;}
+#logout-btn,#reset-demo-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.15);font-size:.75rem;}
+#logout-btn:hover,#reset-demo-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
+.container{max-width:1320px;margin:0 auto;padding:1.75rem 1.5rem;}
+.tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border);overflow-x:auto;}
+.tab-btn{padding:.6rem 1.2rem;background:none;border:none;cursor:pointer;font-family:var(--font);font-weight:500;font-size:.84rem;color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab-btn:hover{color:var(--navy-800);}
+.tab-btn.active{color:var(--navy-800);border-bottom-color:var(--navy-800);font-weight:600;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--sh);}
+.card-title{font-size:.97rem;font-weight:600;color:var(--text-1);}
+.card-sub{font-size:.75rem;color:var(--text-3);margin-top:.15rem;margin-bottom:1rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.2rem 1.4rem;box-shadow:var(--sh-sm);position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy-800),var(--crimson));}
+.stat-card p{font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:.35rem;}
+.stat-card h3{font-size:1.6rem;font-weight:700;color:var(--text-1);}
+.table-responsive{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:540px;}
+thead th{padding:.55rem .8rem;text-align:left;font-size:.68rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;background:var(--navy-50);border-bottom:2px solid var(--border);white-space:nowrap;}
+tbody td{padding:.68rem .8rem;border-bottom:1px solid var(--border);color:var(--text-2);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--navy-50);color:var(--text-1);}
+.actions-cell{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:.28rem;padding:.18rem .55rem;border-radius:999px;font-size:.67rem;font-weight:600;letter-spacing:.04em;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.badge-pending{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(154,94,16,.18);}
+.badge-pending::before{background:var(--amber);}
+.badge-paid{background:var(--green-bg);color:var(--green);border:1px solid rgba(29,122,79,.18);}
+.badge-paid::before{background:var(--green);}
+.badge-approved{background:var(--green-bg);color:var(--green);border:1px solid rgba(29,122,79,.18);}
+.badge-approved::before{background:var(--green);}
+.badge-cancelled{background:var(--red-bg);color:var(--red);border:1px solid rgba(184,50,50,.18);}
+.badge-cancelled::before{background:var(--red);}
+.section-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+.accent-rule{width:28px;height:3px;background:var(--crimson);border-radius:2px;margin-bottom:.5rem;}
+.filter-bar{display:flex;gap:.65rem;flex-wrap:wrap;align-items:flex-end;background:var(--navy-50);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1.1rem;margin-bottom:0;}
+.filter-bar .form-group{margin-bottom:0;min-width:120px;flex:1;}
+.filter-bar .form-group label{margin-bottom:.22rem;}
+.validation-table-area{overflow-y:auto;max-height:52vh;border:1px solid var(--border);border-radius:var(--r);margin-top:1rem;background:var(--surface);}
+.validation-table-area .table-responsive{margin-top:0;}
+.validation-table-area table thead th{position:sticky;top:0;z-index:10;}
+.validation-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1.1rem;padding-top:1.1rem;border-top:2px solid var(--border);flex-wrap:wrap;gap:.75rem;}
+.divider{height:1px;background:var(--border);margin:1.4rem 0;}
+.create-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.7rem;align-items:end;}
+input[type="checkbox"]{width:14px;height:14px;accent-color:var(--navy-800);cursor:pointer;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:center;z-index:500;padding:1rem;}
+.modal{background:var(--surface);border:1px solid var(--border-mid);padding:1.75rem;border-radius:var(--r-xl);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(10,20,40,.25);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;padding-bottom:.85rem;border-bottom:2px solid var(--border);}
+.modal-header h3{font-size:.97rem;font-weight:600;color:var(--text-1);}
+.info-box{background:var(--navy-50);border:1px solid var(--navy-100);border-left:3px solid var(--navy-800);border-radius:var(--r-sm);padding:.75rem 1rem;font-size:.82rem;color:var(--text-2);margin-bottom:1rem;}
+.info-box strong{color:var(--text-1);}
+.warn-box{background:var(--amber-bg);border:1px solid rgba(154,94,16,.2);border-left:3px solid var(--amber);border-radius:var(--r-sm);padding:.75rem 1rem;font-size:.82rem;color:var(--amber);margin-bottom:1rem;}
+#toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:1000;display:flex;flex-direction:column;gap:.5rem;}
+.toast{background:var(--surface);border:1px solid var(--border);color:var(--text-1);padding:.7rem 1rem;border-radius:var(--r);opacity:0;transform:translateX(14px);transition:all .25s ease;box-shadow:var(--sh-lg);font-size:.835rem;max-width:290px;font-weight:500;}
+.toast.show{opacity:1;transform:translateX(0);}
+.toast.error{border-left:3px solid var(--red);}
+.toast.success{border-left:3px solid var(--green);}
+.toast.warning{border-left:3px solid var(--amber);}
+.toast.info{border-left:3px solid var(--navy-800);}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text-3);}
+.empty-state .icon{font-size:1.8rem;margin-bottom:.5rem;opacity:.5;}
+.empty-state p{font-size:.82rem;}
+#print-area{display:none;background:white;padding:40px;position:absolute;top:0;left:0;width:100%;z-index:9999;color:#000;}
+.pdf-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;padding-bottom:15px;margin-bottom:20px;}
+.pdf-company h1{font-size:24px;color:#1B2A4A;margin-bottom:5px;}
+.pdf-company p{font-size:14px;color:#555;}
+.pdf-doc-info{text-align:right;}
+.pdf-doc-info h2{font-size:18px;text-transform:uppercase;letter-spacing:1px;}
+.pdf-grid-info{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;font-size:14px;}
+.pdf-col-info strong{display:block;color:#555;font-size:12px;text-transform:uppercase;}
+.payroll-box{border:2px solid #1B2A4A;padding:20px;margin-bottom:20px;border-radius:5px;background:#fdfdfd;}
+.payroll-title{background:#1B2A4A;color:white;padding:5px 10px;margin:-20px -20px 15px -20px;font-weight:bold;font-size:14px;text-align:center;}
+.payroll-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px;}
+.payroll-row.total{margin-top:10px;border-top:1px solid #ccc;padding-top:5px;font-weight:bold;font-size:15px;}
+.payroll-row.deduction{color:#d9534f;}
+.payroll-row.earning{color:#333;}
+.grand-total{text-align:right;font-size:18px;font-weight:bold;border:2px solid #000;display:inline-block;padding:10px 30px;background:#eee;float:right;margin-bottom:40px;}
+.signature-section{display:flex;justify-content:space-between;margin-top:60px;page-break-inside:avoid;}
+.sig-block{width:40%;text-align:center;border-top:1px solid #000;padding-top:5px;font-size:12px;}
+.petty-cash-box{border:2px dashed #555;background-color:#f8f9fa;padding:15px;margin-top:10px;margin-bottom:20px;border-radius:4px;font-size:13px;}
+.petty-cash-header{font-weight:bold;color:#333;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid #ddd;padding-bottom:5px;}
+.petty-cash-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+.petty-cash-excess{color:#d9534f;font-weight:bold;font-size:14px;}
+.petty-cash-ok{color:#28a745;font-weight:bold;}
+.vac-box{border:2px solid #1B2A4A;padding:20px;border-radius:5px;background:#fdfdfd;margin-bottom:20px;}
+.vac-title{background:#1B2A4A;color:white;padding:6px 10px;margin:-20px -20px 15px -20px;font-weight:bold;font-size:15px;text-align:center;letter-spacing:.05em;}
+.vac-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;border-bottom:1px dashed #eee;padding-bottom:5px;}
+.vac-row:last-child{border-bottom:none;}
+.vac-row strong{color:#555;font-size:12px;text-transform:uppercase;display:block;margin-bottom:2px;}
+@media print{body *{visibility:hidden;}#print-area,#print-area *{visibility:visible;}#print-area{position:absolute;left:0;top:0;width:100%;padding:20px;}.grand-total{float:none;display:block;text-align:right;margin-top:20px;}}
+#admin-stats{padding:0;margin-bottom:1.5rem;}
+.s-header-panel{background:linear-gradient(135deg,var(--navy-900) 0%,var(--navy-800) 60%,#2e4270 100%);border-radius:var(--r-xl);padding:2rem 2.25rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;position:relative;overflow:hidden;}
+.s-header-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(192,39,45,0.15) 0%,transparent 70%);}
+.s-header-left{position:relative;z-index:1;}
+.s-header-eyebrow{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--crimson);margin-bottom:.4rem;}
+.s-header-title{font-size:1.6rem;font-weight:700;color:#fff;line-height:1.2;margin-bottom:.3rem;}
+.s-header-sub{font-size:.82rem;color:rgba(255,255,255,.5);}
+.s-header-filters{display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;position:relative;z-index:1;}
+.s-filter-group{display:flex;flex-direction:column;gap:.3rem;}
+.s-filter-label{font-size:.68rem;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;}
+.s-select{padding:.5rem .9rem;border-radius:var(--r-sm);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;font-family:var(--font);font-size:.85rem;cursor:pointer;min-width:130px;}
+.s-select option{background:var(--navy-800);color:#fff;}
+.s-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.25rem;}
+.s-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem 1.4rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--sh-sm);}
+.s-kpi-icon{width:46px;height:46px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+.s-kpi-body{min-width:0;}
+.s-kpi-label{font-size:.68rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.15rem;}
+.s-kpi-value{font-size:1.45rem;font-weight:700;color:var(--text-1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-kpi-sub{font-size:.68rem;color:var(--text-3);margin-top:.1rem;}
+.s-legend-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:.9rem 1.25rem;margin-bottom:1.25rem;box-shadow:var(--sh-sm);}
+.s-legend{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem;align-items:center;}
+.s-legend-item{display:flex;align-items:center;gap:.45rem;font-size:.78rem;font-weight:600;color:var(--text-2);}
+.s-legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.s-charts-main{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;}
+.s-chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);display:flex;flex-direction:column;}
+.s-chart-panel.s-span-2{grid-column:span 2;}
+.s-chart-header{padding:1rem 1.4rem .75rem;border-bottom:1px solid var(--border);}
+.s-chart-label{font-size:.65rem;font-weight:700;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.s-chart-title{font-size:.9rem;font-weight:600;color:var(--text-1);}
+.s-chart-body{padding:1rem;position:relative;flex:1;}
+.s-rankings-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.25rem;}
+.s-rank-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem 1.4rem;box-shadow:var(--sh-sm);}
+.s-rank-list{list-style:none;}
+.s-rank-list li{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border);}
+.s-rank-list li:last-child{border-bottom:none;padding-bottom:0;}
+.s-rank-num{width:24px;height:24px;border-radius:50%;background:var(--navy-50);color:var(--text-3);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border);}
+.s-rank-num.r1{background:#fef3c7;color:#92400e;border-color:#fcd34d;}
+.s-rank-num.r2{background:#f1f5f9;color:#475569;border-color:#cbd5e1;}
+.s-rank-num.r3{background:#fef2f2;color:#991b1b;border-color:#fca5a5;}
+.s-rank-info{flex:1;min-width:0;}
+.s-rank-name{font-size:.82rem;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.25rem;}
+.s-rank-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.s-rank-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--navy-800),var(--crimson));}
+.s-rank-val{font-size:.78rem;font-weight:700;color:var(--text-2);min-width:80px;text-align:right;flex-shrink:0;}
+.s-empty{text-align:center;padding:4rem 2rem;color:var(--text-3);font-size:.9rem;}
+.s-empty div{font-size:2.5rem;margin-bottom:.75rem;opacity:.5;}
+@media(max-width:900px){.create-form-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:1100px){.s-kpi-row{grid-template-columns:repeat(2,1fr);}.s-charts-main{grid-template-columns:1fr 1fr;}.s-chart-panel.s-span-2{grid-column:span 2;}.s-rankings-row{grid-template-columns:1fr;}}
+@media(max-width:768px){.container{padding:1rem;}header{padding:0 1rem;}.card{padding:1.1rem;}.stats-grid{grid-template-columns:1fr 1fr;}.filter-bar{padding:.8rem;}.filter-bar .form-group{min-width:110px;}.modal{padding:1.25rem;}.create-form-grid{grid-template-columns:1fr;}.header-tag,.header-sep{display:none;}.validation-footer{flex-direction:column;}.validation-footer .btn{width:100%;justify-content:center;}.s-header-panel{padding:1.5rem 1.25rem;}.s-header-title{font-size:1.25rem;}.s-kpi-row{grid-template-columns:1fr 1fr;}.s-charts-main{grid-template-columns:1fr;}.s-chart-panel.s-span-2{grid-column:span 1;}}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr;}#user-display-name{display:none;}.stat-card h3{font-size:1.4rem;}.s-kpi-row{grid-template-columns:1fr;}}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<!-- LOGIN -->
+<section id="login-view">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="demo-badge">● Demo — datos de ejemplo</div><br>
+      <div class="login-brand-block"><span class="brand-dot"></span><span class="login-brand-text">Gestiona+</span></div>
+      <p class="login-sub">Sistema de Nómina</p>
+    </div>
+    <div class="login-divider"></div>
+    <button type="button" class="role-btn admin" onclick="window.demoLogin('admin')">
+      <div class="ri">🛡️</div>
+      <div><div class="rt">Entrar como Administrador</div><div class="rs">Panel completo: planilla, vacaciones, estadísticas</div></div>
+    </button>
+    <button type="button" class="role-btn tech" onclick="window.demoLogin('tech')">
+      <div class="ri">🧑‍🔧</div>
+      <div><div class="rt">Entrar como Técnico</div><div class="rs">Horas, gastos y vacaciones personales</div></div>
+    </button>
+    <div style="text-align:center;margin-top:.5rem">
+      <button type="button" onclick="window.resetDemo()" style="background:none;border:none;color:var(--text-3);font-size:.75rem;cursor:pointer;text-decoration:underline">↺ Reiniciar datos de demo</button>
+    </div>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app-view" class="hidden">
+  <header>
+    <div class="header-left">
+      <div class="header-brand">Gestiona<em>+</em></div>
+      <div class="header-sep"></div>
+      <span class="header-tag">Gestión de Nómina · Demo</span>
+    </div>
+    <div class="user-info">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar-initial">U</div>
+        <span id="user-display-name">Usuario</span>
+      </div>
+      <button id="reset-demo-btn" class="btn btn-sm" onclick="window.resetDemo()">↺ Reiniciar</button>
+      <button id="logout-btn" class="btn btn-sm">Salir</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ══ PANEL TÉCNICO ══ -->
+    <div id="technician-panel" class="hidden">
+      <div class="stats-grid">
+        <div class="stat-card"><p>Horas Extra Pendientes</p><h3 id="tech-pending-hours">0</h3></div>
+        <div class="stat-card"><p>Gastos Pendientes</p><h3 id="tech-pending-expenses">₡0</h3></div>
+        <div class="stat-card"><p>Días Vacaciones Disponibles</p><h3 id="tech-vac-days">0</h3></div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="window.switchTab('tech-hours')">Horas</button>
+        <button class="tab-btn" onclick="window.switchTab('tech-expenses')">Gastos</button>
+        <button class="tab-btn" onclick="window.switchTab('tech-vacations')">Vacaciones</button>
+        <button class="tab-btn" onclick="window.switchTab('tech-profile')">Mi Perfil</button>
+      </div>
+
+      <div id="tech-hours" class="card">
+        <div class="section-header">
+          <div><div class="accent-rule"></div><div class="card-title">Mis Horas Extra</div><div class="card-sub">Horas fuera del horario regular</div></div>
+          <button class="btn btn-primary" onclick="window.openModal('modal-hour')">+ Nueva Entrada</button>
+        </div>
+        <div class="table-responsive">
+          <table id="tech-hours-table"><thead><tr><th>Fecha</th><th>Cliente/Proyecto</th><th>Inicio</th><th>Fin</th><th>Total</th><th>Extra</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <div id="tech-expenses" class="card hidden">
+        <div class="section-header">
+          <div><div class="accent-rule"></div><div class="card-title">Mis Gastos y Facturas</div><div class="card-sub">Reembolsos y liquidaciones pendientes</div></div>
+          <button class="btn btn-primary" onclick="window.openModal('modal-expense')">+ Nuevo Gasto</button>
+        </div>
+        <div class="table-responsive">
+          <table id="tech-expenses-table"><thead><tr><th>Fecha</th><th>Factura #</th><th>Cliente/Proyecto</th><th>Tipo</th><th>Comercio</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <div id="tech-vacations" class="card hidden">
+        <div class="section-header">
+          <div><div class="accent-rule"></div><div class="card-title">Mis Solicitudes de Vacaciones</div><div class="card-sub">Solicita, revisa el estado y descarga tu boleta</div></div>
+          <button class="btn btn-primary" onclick="window.openModal('modal-vac-request')">+ Solicitar Vacaciones</button>
+        </div>
+        <div class="table-responsive">
+          <table id="tech-vac-table"><thead><tr><th>Fecha Solicitud</th><th>Desde</th><th>Hasta</th><th>Días</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <div id="tech-profile" class="card hidden">
+        <div class="accent-rule"></div>
+        <div class="card-title">Mi Cuenta</div>
+        <div class="card-sub">Este es el correo con el que iniciás sesión</div>
+        <div class="info-box" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem">
+          <div>
+            <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600">Correo actual</div>
+            <div id="profile-current-email" style="font-weight:600;color:var(--text-1);font-size:.95rem">—</div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="window.openModal('modal-change-email')">Cambiar correo</button>
+        </div>
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:.9rem">Datos del perfil</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem">
+          <div><div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600">Nombre</div><div id="profile-name" style="font-weight:600">—</div></div>
+          <div><div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600">Fecha de ingreso</div><div id="profile-startdate" style="font-weight:600">—</div></div>
+          <div><div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600">Días de vacaciones</div><div id="profile-vacdays" style="font-weight:600">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL ADMIN ══ -->
+    <div id="admin-panel" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="window.switchAdminTab('admin-users')">Técnicos</button>
+        <button class="tab-btn" onclick="window.switchAdminTab('admin-validation')">Planilla</button>
+        <button class="tab-btn" onclick="window.switchAdminTab('admin-vacations')">Vacaciones</button>
+        <button class="tab-btn" onclick="window.switchAdminTab('admin-stats')">Estadísticas</button>
+      </div>
+
+      <div id="admin-users" class="card">
+        <div class="accent-rule"></div>
+        <div class="card-title">Crear Nuevo Técnico</div>
+        <div class="card-sub">Agregar un miembro al equipo de trabajo</div>
+        <form id="create-user-form">
+          <div class="create-form-grid">
+            <div class="form-group" style="grid-column:span 2"><label>Nombre Completo</label><input type="text" id="new-fullname" class="form-control" required></div>
+            <div class="form-group"><label>Correo</label><input type="email" id="new-email" class="form-control" required></div>
+            <div class="form-group"><label>Salario Mensual (₡)</label><input type="number" id="new-salary" class="form-control" required></div>
+            <div class="form-group"><label>Fecha de Ingreso</label><input type="date" id="new-start-date" class="form-control" required></div>
+            <div class="form-group"><label>Días Vacaciones Iniciales</label><input type="number" id="new-vacation-days" class="form-control" value="0" min="0" step="0.5"></div>
+            <div class="form-group" style="display:flex;align-items:flex-end"><button type="submit" class="btn btn-success w-full">Crear Técnico</button></div>
+          </div>
+        </form>
+        <div class="divider"></div>
+        <div class="card-title" style="margin-bottom:.9rem">Equipo Técnico Registrado</div>
+        <div class="table-responsive">
+          <table><thead><tr><th>Nombre</th><th>Salario</th><th>Vacaciones</th><th>Fecha Ingreso</th><th>Email</th><th>Acciones</th></tr></thead><tbody id="users-table-body"></tbody></table>
+        </div>
+        <div class="divider" style="margin-top:1.75rem"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem">
+          <div><div class="card-title" style="margin-bottom:.15rem">Historial de Técnicos Eliminados</div><div class="card-sub" style="margin-bottom:0">Puedes restaurar su perfil y registros históricos.</div></div>
+        </div>
+        <div id="deleted-users-empty" class="empty-state hidden"><div class="icon">✅</div><p>Sin técnicos eliminados</p></div>
+        <div class="table-responsive" id="deleted-users-wrap" style="display:none">
+          <table><thead><tr><th>Nombre</th><th>Email</th><th>Salario</th><th>Eliminado</th><th>Acciones</th></tr></thead><tbody id="deleted-users-body"></tbody></table>
+        </div>
+      </div>
+
+      <div id="admin-validation" class="card hidden">
+        <div class="accent-rule"></div>
+        <div class="card-title">Planilla — Validación y Pagos</div>
+        <div class="card-sub">Revisión, aprobación y generación de documentos de pago</div>
+        <div class="filter-bar">
+          <div class="form-group"><label>Tipo</label><select id="filter-type-select" class="form-control" onchange="window.renderValidationTable()"><option value="all">Todos</option><option value="hour">Horas</option><option value="expense">Gastos</option></select></div>
+          <div class="form-group"><label>Técnico</label><select id="filter-tech-select" class="form-control" onchange="window.renderValidationTable()"><option value="all">Todos</option></select></div>
+          <div class="form-group"><label>Periodo</label><select id="filter-period-select" class="form-control"><option value="biweekly">Quincenal</option><option value="monthly">Mensual</option></select></div>
+          <div class="form-group"><label>Fecha Inicio</label><input type="date" id="filter-start-date" class="form-control" onchange="window.renderValidationTable()"></div>
+          <div class="form-group"><label>Fecha Fin</label><input type="date" id="filter-end-date" class="form-control" onchange="window.renderValidationTable()"></div>
+        </div>
+        <div class="validation-table-area">
+          <div class="table-responsive">
+            <table id="validation-table"><thead><tr><th style="width:36px"><input type="checkbox" id="select-all-validation" onclick="window.toggleSelectAllValidation()"></th><th>Técnico</th><th>Tipo</th><th>Fecha</th><th>Cliente/Proyecto</th><th>Detalle</th><th>Monto / Horas</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+        <div class="validation-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.generateValidationPDF()">↓ Generar PDF</button>
+          <button type="button" class="btn btn-accent" onclick="window.markSelectedAsPaid()">✓ Procesar como Pagado</button>
+        </div>
+      </div>
+
+      <div id="admin-vacations" class="card hidden">
+        <div class="accent-rule"></div>
+        <div class="card-title">Solicitudes de Vacaciones</div>
+        <div class="card-sub">Aprueba, rechaza y genera boletas.</div>
+        <div class="filter-bar" style="margin-bottom:0">
+          <div class="form-group"><label>Estado</label><select id="vac-filter-status" class="form-control" onchange="window.renderAdminVacTable()"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="approved">Aprobadas</option><option value="cancelled">Canceladas</option></select></div>
+          <div class="form-group"><label>Técnico</label><select id="vac-filter-tech" class="form-control" onchange="window.renderAdminVacTable()"><option value="all">Todos</option></select></div>
+        </div>
+        <div class="validation-table-area">
+          <div class="table-responsive">
+            <table id="admin-vac-table"><thead><tr><th>Técnico</th><th>Solicitado</th><th>Desde</th><th>Hasta</th><th>Días</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="admin-stats" class="card hidden" style="padding:0;background:transparent;border:none;box-shadow:none;">
+        <div class="s-header-panel">
+          <div class="s-header-left">
+            <div class="s-header-eyebrow">Panel Ejecutivo</div>
+            <h2 class="s-header-title">Análisis de Planilla</h2>
+            <p class="s-header-sub">Gastos, horas extra y costos salariales del equipo</p>
+          </div>
+          <div class="s-header-filters">
+            <div class="s-filter-group"><label class="s-filter-label">Año</label><select id="stats-year" class="s-select" onchange="window.loadStats()"></select></div>
+            <div class="s-filter-group"><label class="s-filter-label">Mes</label>
+              <select id="stats-month" class="s-select" onchange="window.loadStats()">
+                <option value="all">Todo el año</option>
+                <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Setiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="s-kpi-row">
+          <div class="s-kpi"><div class="s-kpi-icon" style="background:linear-gradient(135deg,#1B2A4A,#2e4270)">💰</div><div class="s-kpi-body"><div class="s-kpi-label">Total Gastos</div><div class="s-kpi-value" id="kpi-expenses">₡0</div><div class="s-kpi-sub">reembolsos del periodo</div></div></div>
+          <div class="s-kpi"><div class="s-kpi-icon" style="background:linear-gradient(135deg,#c0272d,#9a1e23)">⏱</div><div class="s-kpi-body"><div class="s-kpi-label">Total Horas Extra</div><div class="s-kpi-value" id="kpi-hours">0 h</div><div class="s-kpi-sub">fuera del horario regular</div></div></div>
+          <div class="s-kpi"><div class="s-kpi-icon" style="background:linear-gradient(135deg,#1d7a4f,#155f39)">📈</div><div class="s-kpi-body"><div class="s-kpi-label">Costo Horas Extra</div><div class="s-kpi-value" id="kpi-extra-cost">₡0</div><div class="s-kpi-sub">estimado bruto</div></div></div>
+          <div class="s-kpi"><div class="s-kpi-icon" style="background:linear-gradient(135deg,#7c3aed,#5b21b6)">👥</div><div class="s-kpi-body"><div class="s-kpi-label">Técnicos Activos</div><div class="s-kpi-value" id="kpi-techs">0</div><div class="s-kpi-sub">con registros en el periodo</div></div></div>
+        </div>
+        <div class="s-legend-wrap"><div class="s-legend" id="s-legend-global"></div></div>
+        <div class="s-charts-main">
+          <div class="s-chart-panel s-span-2"><div class="s-chart-header"><div class="s-chart-label">GASTOS MENSUALES</div><div class="s-chart-title">Comparativa de reembolsos por técnico</div></div><div class="s-chart-body" style="height:260px"><canvas id="chart-expenses-monthly"></canvas></div></div>
+          <div class="s-chart-panel"><div class="s-chart-header"><div class="s-chart-label">DISTRIBUCIÓN</div><div class="s-chart-title">Gastos por técnico</div></div><div class="s-chart-body" style="height:260px"><canvas id="chart-donut-expenses"></canvas></div></div>
+        </div>
+        <div class="s-charts-main">
+          <div class="s-chart-panel"><div class="s-chart-header"><div class="s-chart-label">HORAS EXTRA</div><div class="s-chart-title">Evolución mensual</div></div><div class="s-chart-body" style="height:220px"><canvas id="chart-hours-monthly"></canvas></div></div>
+          <div class="s-chart-panel"><div class="s-chart-header"><div class="s-chart-label">COSTO SALARIAL</div><div class="s-chart-title">Horas extra por técnico</div></div><div class="s-chart-body" style="height:220px"><canvas id="chart-cost-monthly"></canvas></div></div>
+          <div class="s-chart-panel"><div class="s-chart-header"><div class="s-chart-label">DISTRIBUCIÓN</div><div class="s-chart-title">Costo extra</div></div><div class="s-chart-body" style="height:220px"><canvas id="chart-donut-cost"></canvas></div></div>
+        </div>
+        <div class="s-rankings-row">
+          <div class="s-rank-panel"><div class="s-chart-label" style="margin-bottom:.75rem">🏆 RANKING GASTOS</div><ul class="s-rank-list" id="rank-expenses"></ul></div>
+          <div class="s-rank-panel"><div class="s-chart-label" style="margin-bottom:.75rem">⏱ RANKING HORAS EXTRA</div><ul class="s-rank-list" id="rank-hours"></ul></div>
+          <div class="s-rank-panel"><div class="s-chart-label" style="margin-bottom:.75rem">💰 RANKING COSTO EXTRA</div><ul class="s-rank-list" id="rank-cost"></ul></div>
+        </div>
+        <div id="stats-empty" class="s-empty hidden"><div>📊</div><p>Sin registros para el periodo seleccionado</p></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALES -->
+<div id="modal-hour" class="modal-overlay hidden"><div class="modal">
+  <div class="modal-header"><h3 id="hour-modal-title">Registro de Horas</h3><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="window.closeModal('modal-hour')">✕</button></div>
+  <form id="hour-form">
+    <input type="hidden" id="hour-id">
+    <div class="form-group"><label>Cliente / Proyecto</label><input type="text" id="hour-client" class="form-control" required placeholder="Nombre del cliente o proyecto"></div>
+    <div class="form-group"><label>Fecha</label><input type="date" id="hour-date" class="form-control" required></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+      <div class="form-group"><label>Hora Inicio</label><input type="time" id="hour-start" class="form-control" required></div>
+      <div class="form-group"><label>Hora Fin</label><input type="time" id="hour-end" class="form-control" required></div>
+    </div>
+    <button type="submit" class="btn btn-success w-full" style="margin-top:.35rem;padding:.65rem">Guardar Registro</button>
+  </form>
+</div></div>
+
+<div id="modal-expense" class="modal-overlay hidden"><div class="modal">
+  <div class="modal-header"><h3 id="expense-modal-title">Registro de Gastos</h3><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="window.closeModal('modal-expense')">✕</button></div>
+  <form id="expense-form">
+    <input type="hidden" id="expense-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+      <div class="form-group"><label>Fecha</label><input type="date" id="exp-date" class="form-control" required></div>
+      <div class="form-group"><label>Factura #</label><input type="text" id="exp-invoice" class="form-control" required placeholder="001-000-000"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+      <div class="form-group"><label>Cliente / Proyecto</label><input type="text" id="exp-client" class="form-control" placeholder="Opcional"></div>
+      <div class="form-group">
+        <label>Tipo de Gasto</label>
+        <select id="exp-type" class="form-control" required onchange="window.toggleOtrosField(this.value)">
+          <option value="">Seleccione...</option>
+          <option value="Materiales">Materiales</option><option value="Insumos">Insumos</option><option value="Herramientas">Herramientas</option>
+          <option value="Repuestos">Repuestos</option><option value="Combustible">Combustible</option><option value="Viaticos">Viáticos</option>
+          <option value="Hospedaje">Hospedaje</option><option value="Parqueo">Parqueo</option><option value="Peajes">Peajes</option><option value="Otros">Otros</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Comercio</label><input type="text" id="exp-store" class="form-control" required placeholder="Nombre del comercio"></div>
+    <div class="form-group hidden" id="otros-field-wrap">
+      <label>Especifique el gasto <span style="color:var(--crimson)">*</span></label>
+      <input type="text" id="exp-otros-detail" class="form-control" placeholder="Describa el tipo de gasto…">
+    </div>
+    <div class="form-group"><label>Descripción <span style="color:var(--text-3);font-weight:400;font-size:.75rem">(opcional)</span></label><textarea id="exp-desc" class="form-control" rows="2"></textarea></div>
+    <div class="form-group"><label>Monto (₡)</label><input type="number" id="exp-amount" class="form-control" required min="0" placeholder="0"></div>
+    <button type="submit" class="btn btn-success w-full" style="margin-top:.35rem;padding:.65rem">Guardar Gasto</button>
+  </form>
+</div></div>
+
+<div id="modal-tech-edit" class="modal-overlay hidden"><div class="modal">
+  <div class="modal-header"><h3>Editar Perfil del Técnico</h3><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="window.closeModal('modal-tech-edit')">✕</button></div>
+  <form id="tech-edit-form">
+    <input type="hidden" id="edit-tech-id">
+    <div class="form-group"><label>Nombre Completo</label><input type="text" id="edit-tech-fullname" class="form-control" required></div>
+    <div class="form-group"><label>Salario Mensual (₡)</label><input type="number" id="edit-tech-salary" class="form-control" required min="0"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+      <div class="form-group"><label>Fecha de Ingreso</label><input type="date" id="edit-start-date" class="form-control"></div>
+      <div class="form-group"><label>Días Vacaciones</label><input type="number" id="edit-vacation-days" class="form-control" min="0" step="0.5"></div>
+    </div>
+    <button type="submit" class="btn btn-success w-full" style="margin-top:.35rem;padding:.65rem">Actualizar Perfil</button>
+  </form>
+</div></div>
+
+<div id="modal-vac-request" class="modal-overlay hidden"><div class="modal">
+  <div class="modal-header"><h3>Solicitar Vacaciones</h3><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="window.closeModal('modal-vac-request')">✕</button></div>
+  <div id="vac-request-info" class="info-box"></div>
+  <form id="vac-request-form">
+    <div class="form-group">
+      <label>Tipo de solicitud</label>
+      <div style="display:flex;gap:.5rem;margin-top:.3rem">
+        <button type="button" id="vac-type-full" onclick="window.setVacType('full')" style="flex:1;padding:.55rem;border-radius:var(--r-sm);border:2px solid var(--navy-800);background:var(--navy-800);color:#fff;font-weight:600;font-size:.82rem;cursor:pointer">📅 Días completos</button>
+        <button type="button" id="vac-type-half" onclick="window.setVacType('half')" style="flex:1;padding:.55rem;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-weight:600;font-size:.82rem;cursor:pointer">🌗 Medio día</button>
+      </div>
+    </div>
+    <input type="hidden" id="vac-type" value="full">
+    <div id="vac-full-section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+        <div class="form-group"><label>Fecha Inicio</label><input type="date" id="vac-from" class="form-control" oninput="window.calcVacDays()"></div>
+        <div class="form-group"><label>Fecha Fin</label><input type="date" id="vac-to" class="form-control" oninput="window.calcVacDays()"></div>
+      </div>
+    </div>
+    <div id="vac-half-section" style="display:none">
+      <div class="form-group"><label>Fecha</label><input type="date" id="vac-half-date" class="form-control" oninput="window.calcVacDays()"></div>
+      <div class="form-group">
+        <label>¿Cuál mitad?</label>
+        <div style="display:flex;gap:.5rem;margin-top:.3rem">
+          <button type="button" id="vac-half-am" onclick="window.setHalfPeriod('AM')" style="flex:1;padding:.45rem;border-radius:var(--r-sm);border:2px solid var(--navy-800);background:var(--navy-800);color:#fff;font-size:.82rem;cursor:pointer;font-weight:600">🌅 Mañana (AM)</button>
+          <button type="button" id="vac-half-pm" onclick="window.setHalfPeriod('PM')" style="flex:1;padding:.45rem;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:.82rem;cursor:pointer;font-weight:600">🌇 Tarde (PM)</button>
+        </div>
+      </div>
+      <input type="hidden" id="vac-half-period" value="AM">
+    </div>
+    <div id="vac-days-preview" class="info-box hidden"></div>
+    <div class="form-group"><label>Motivo / Observación (opcional)</label><textarea id="vac-reason" class="form-control" rows="2"></textarea></div>
+    <button type="submit" class="btn btn-success w-full" style="margin-top:.35rem;padding:.65rem">Enviar Solicitud</button>
+  </form>
+</div></div>
+
+<div id="modal-change-email" class="modal-overlay hidden"><div class="modal" style="max-width:460px">
+  <div class="modal-header"><h3>Cambiar correo de acceso</h3><button type="button" class="btn btn-danger btn-sm btn-icon" onclick="window.closeModal('modal-change-email')">✕</button></div>
+  <div class="info-box" style="font-size:.8rem">Modo demo: el cambio se aplica al instante, sin verificación real por correo. En la versión completa se envía un enlace de confirmación al correo nuevo.</div>
+  <form id="change-email-form">
+    <div class="form-group"><label>Correo nuevo</label><input type="email" id="ce-new-email" class="form-control" required placeholder="nuevo@correo.com"></div>
+    <button type="submit" class="btn btn-success w-full" style="margin-top:.35rem;padding:.65rem">Actualizar correo</button>
+  </form>
+</div></div>
+
+<div id="modal-confirm-delete" class="modal-overlay hidden">
+  <div class="modal" style="max-width:370px;text-align:center">
+    <div style="font-size:2rem;margin-bottom:.65rem">⚠️</div>
+    <h3 style="font-size:.97rem;font-weight:600;color:var(--red);margin-bottom:.5rem">Confirmar Eliminación</h3>
+    <p style="color:var(--text-2);font-size:.82rem;margin-bottom:1.4rem">Esta acción no se puede deshacer. ¿Deseas eliminar este registro?</p>
+    <div style="display:flex;gap:.7rem;justify-content:center">
+      <button type="button" class="btn btn-secondary" onclick="window.cancelDelete()" style="min-width:88px">Cancelar</button>
+      <button type="button" class="btn btn-sm" onclick="window.confirmDeleteAction()" style="min-width:88px;background:var(--red);color:#fff;border-color:var(--red);padding:.5rem 1rem;font-size:.82rem">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print area -->
+<div id="print-area">
+  <div class="pdf-header">
+    <div class="pdf-company"><h1>Gestiona+</h1><p>Documento de Pago (Demo)</p></div>
+    <div class="pdf-doc-info"><h2 id="print-doc-type">LISTA DE PAGO</h2><p id="print-date">Fecha: 01/01/2024</p></div>
+  </div>
+  <div class="pdf-grid-info">
+    <div class="pdf-col-info"><strong>Empleado:</strong><span id="print-tech-name" style="font-weight:bold;font-size:16px"></span></div>
+    <div class="pdf-col-info"><strong>Periodo:</strong><span id="print-period-text">Del 01 al 15</span></div>
+    <div class="pdf-col-info"><strong>Saldo Vacaciones:</strong><span id="print-vacation-days" style="font-weight:bold;color:#1B2A4A">0 días</span></div>
+    <div class="pdf-col-info"><strong>Moneda:</strong><span>Colones (₡)</span></div>
+  </div>
+  <div id="print-tables-container"></div>
+  <div class="grand-total">TOTAL A PAGAR: <span id="print-final-total">₡0</span></div>
+  <div style="clear:both"></div>
+  <div class="signature-section" id="print-signatures">
+    <div class="sig-block">Firma Recibido<br><br>___________________</div>
+    <div class="sig-block">Firma Autorizada<br><br>___________________</div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   GESTIONA+ — NÓMINA (DEMO OFFLINE, SIN BACKEND)
+════════════════════════════════════════════════ */
+const LS_KEY='gestionamas_demo_db_v1';
+let DB=null, currentUser=null, pendingDelete={type:null,id:null};
+
+function uid(p){return p+'_'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);}
+
+function seedDB(){
+  const u1='u_carlos',u2='u_luis',u3='u_jose',u4='u_esteban',u5='u_diego';
+  const users=[
+    {id:u1,fullName:'Carlos Mora Vindas',email:'carlos.mora@gestionamas-demo.com',salary:850000,startDate:'2022-03-01',vacationDays:8},
+    {id:u2,fullName:'Luis Fernández Rojas',email:'luis.fernandez@gestionamas-demo.com',salary:720000,startDate:'2023-06-15',vacationDays:5},
+    {id:u3,fullName:'José Araya Solano',email:'jose.araya@gestionamas-demo.com',salary:950000,startDate:'2021-01-10',vacationDays:11},
+    {id:u4,fullName:'Esteban Jiménez Brenes',email:'esteban.jimenez@gestionamas-demo.com',salary:680000,startDate:'2024-02-01',vacationDays:3},
+    {id:u5,fullName:'Diego Castro Vargas',email:'diego.castro@gestionamas-demo.com',salary:780000,startDate:'2023-01-20',vacationDays:6.5},
+  ];
+  const records=[];
+  const expenseTypes=['Materiales','Combustible','Viaticos','Herramientas','Repuestos','Hospedaje'];
+  const stores=['Ferretería EPA','Gasolinera Delta','Restaurante Soda Tía Flor','AutoRepuestos CR','Hotel Bougainvillea','Construplaza'];
+  const clients=['Grupo Industrial Centroamericano','Hospital CIMA','Condominio Trejos Montealegre','Zona Franca Coyol','Planta Embotelladora Volcán'];
+  const today=new Date();
+  function fmtD(d){return d.toISOString().slice(0,10);}
+  function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+  // Genera horas y gastos para los últimos 2 meses por técnico
+  users.forEach((u,ui)=>{
+    for(let m=0;m<2;m++){
+      const base=new Date(today.getFullYear(),today.getMonth()-m,1);
+      // 2-3 registros de horas (algunos sábado/domingo)
+      for(let i=0;i<2+((ui+m)%2);i++){
+        const day=5+((ui*3+i*4+m*2)%23);
+        let d=new Date(base.getFullYear(),base.getMonth(),day);
+        if(d>today)d=addDays(today,-((ui+i+1)*2));
+        const isWeekendPick=(ui+i)%3===0;
+        if(isWeekendPick){const dow=d.getDay();d=addDays(d,(6-dow+7)%7);} // empuja a sábado
+        const dateStr=fmtD(d);
+        const sH=7+((ui+i)%2), eH=sH+4+((ui+i)%3);
+        const extra=(2+((ui+i+m)%4)*0.5).toFixed(1);
+        records.push({id:uid('rec'),type:'hour',userId:u.id,date:dateStr,
+          startTime:String(sH).padStart(2,'0')+':30',endTime:String(Math.min(eH,22)).padStart(2,'0')+':00',
+          client:clients[(ui+i)%clients.length],
+          total:(parseFloat(extra)+8).toFixed(1),regular:'8.0',extra:extra,
+          status:(m===1?'paid':( (ui+i)%2===0?'pending':'paid'))});
+      }
+      // 2 gastos
+      for(let i=0;i<2;i++){
+        const day=3+((ui*5+i*6+m*3)%24);
+        let d=new Date(base.getFullYear(),base.getMonth(),day);
+        if(d>today)d=addDays(today,-((ui+i+1)*3));
+        const dateStr=fmtD(d);
+        const amt=[8500,15200,32000,54000,12500,21000][(ui+i+m)%6];
+        records.push({id:uid('rec'),type:'expense',userId:u.id,date:dateStr,
+          invoiceNum:'00'+(1+ui)+'-00'+(1+i)+'-'+(1000+ui*7+i*3+m),
+          client:clients[(ui+i+1)%clients.length],
+          expenseType:expenseTypes[(ui+i+m)%expenseTypes.length],
+          store:stores[(ui+i+m)%stores.length],
+          description:'',amount:amt,
+          status:(m===1?'paid':((ui+i)%2===0?'pending':'paid'))});
+      }
+    }
+  });
+  const vacationRequests=[
+    {id:uid('vac'),userId:u2,userName:'Luis Fernández Rojas',fromDate:fmtD(addDays(today,10)),toDate:fmtD(addDays(today,14)),days:5,reason:'Viaje familiar',isHalf:false,halfPeriod:null,status:'pending',requestedAt:new Date(addDays(today,-2)).toISOString()},
+    {id:uid('vac'),userId:u1,userName:'Carlos Mora Vindas',fromDate:fmtD(addDays(today,-20)),toDate:fmtD(addDays(today,-18)),days:3,reason:'Descanso',isHalf:false,halfPeriod:null,status:'approved',requestedAt:new Date(addDays(today,-25)).toISOString(),approvedAt:new Date(addDays(today,-24)).toISOString(),approvedBy:'Administradora Demo'},
+    {id:uid('vac'),userId:u4,userName:'Esteban Jiménez Brenes',fromDate:fmtD(addDays(today,3)),toDate:fmtD(addDays(today,3)),days:0.5,reason:'Cita médica',isHalf:true,halfPeriod:'PM',status:'pending',requestedAt:new Date(addDays(today,-1)).toISOString()},
+    {id:uid('vac'),userId:u3,userName:'José Araya Solano',fromDate:fmtD(addDays(today,-40)),toDate:fmtD(addDays(today,-35)),days:4,reason:'Vacaciones programadas',isHalf:false,halfPeriod:null,status:'cancelled',requestedAt:new Date(addDays(today,-45)).toISOString(),cancelledAt:new Date(addDays(today,-42)).toISOString()},
+  ];
+  return {users,records,vacationRequests,deletedUsers:[]};
+}
+
+function loadDB(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(raw)return JSON.parse(raw);
+  }catch(e){}
+  const fresh=seedDB();
+  try{localStorage.setItem(LS_KEY,JSON.stringify(fresh));}catch(e){}
+  return fresh;
+}
+function saveDB(){try{localStorage.setItem(LS_KEY,JSON.stringify(DB));}catch(e){}}
+window.resetDemo=function(){
+  if(!confirm('¿Reiniciar todos los datos de la demo a su estado original?'))return;
+  try{localStorage.removeItem(LS_KEY);}catch(e){}
+  location.reload();
+};
+
+/* ── UTILS ── */
+const fmt=a=>'₡'+parseFloat(a||0).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;};
+const showToast=(msg,type='info')=>{
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),80);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},3500);
+};
+const getMonthsDiff=s=>{
+  if(!s)return 0;
+  const st=new Date(s+'T00:00:00'),now=new Date();
+  let m=(now.getFullYear()-st.getFullYear())*12+(now.getMonth()-st.getMonth());
+  if(now.getDate()<st.getDate())m--;
+  return m<0?0:m;
+};
+const countWorkDays=(fromStr,toStr)=>{
+  const from=new Date(fromStr+'T00:00:00'),to=new Date(toStr+'T00:00:00');
+  if(to<from)return 0;
+  let count=0;const cur=new Date(from);
+  while(cur<=to){const d=cur.getDay();if(d!==0&&d!==6)count++;cur.setDate(cur.getDate()+1);}
+  return count;
+};
+
+/* ── BUSINESS LOGIC (igual que la versión real) ── */
+function calcTime(dateStr,startStr,endStr){
+  const stdS=7.5,stdE=17.0;
+  const day=new Date(dateStr+'T00:00:00').getDay();
+  const td=t=>{const[h,m]=t.split(':').map(Number);return h+m/60;};
+  const sH=td(startStr),eH=td(endStr);
+  let tot=(eH-sH)*60;
+  if(tot<=0)return{total:'0.0',regular:'0.0',extra:'0.0'};
+  let reg=0,ext=0;
+  if(day===0||day===6){ext=tot;}else{const ov=Math.max(0,(Math.min(eH,stdE)-Math.max(sH,stdS))*60);reg=ov;ext=tot-reg;}
+  return{total:(tot/60).toFixed(1),regular:(reg/60).toFixed(1),extra:(ext/60).toFixed(1)};
+}
+function calcIncomeTax(gross, period){
+  const monthlyBrackets=[
+    {label:'Exento',limit:918000,rate:0},
+    {label:'10%',limit:1347000,rate:0.10},
+    {label:'15%',limit:2364000,rate:0.15},
+    {label:'20%',limit:4727000,rate:0.20},
+    {label:'25%',limit:Infinity,rate:0.25}
+  ];
+  const factor=period==='biweekly'?0.5:1;
+  let tax=0,prevLimit=0;
+  const breakdown=[];
+  for(const b of monthlyBrackets){
+    const limit=b.limit===Infinity?Infinity:b.limit*factor;
+    if(gross>prevLimit){
+      const taxable=Math.min(gross,limit)-prevLimit;
+      const taxAmt=taxable*b.rate;
+      tax+=taxAmt;
+      if(taxable>0&&b.rate>0)breakdown.push({label:b.label,taxable,rate:b.rate,tax:taxAmt});
+    }
+    prevLimit=limit;
+    if(gross<=limit)break;
+  }
+  return{total:tax,breakdown};
+}
+function calcPay(techId,hoursList,period='monthly'){
+  const tech=DB.users.find(u=>u.id===techId);
+  if(!tech||!tech.salary)return null;
+  const sal=parseFloat(tech.salary);
+  const base=period==='biweekly'?sal/2:sal;
+  const hr=sal/240,satR=hr*1.5,sunR=hr*2;
+  let sat=0,sun=0;
+  (hoursList||[]).forEach(r=>{const d=new Date(r.date+'T00:00:00').getDay();const x=parseFloat(r.extra);if(d===0)sun+=x;else sat+=x;});
+  const gSat=sat*satR,gSun=sun*sunR,gEx=gSat+gSun,total=base+gEx;
+  const ccss=total*0.1083;
+  const rentaResult=calcIncomeTax(total,period);
+  const renta=rentaResult.total;
+  return{baseSalary:base,gross:gEx,ccss,renta,rentaBreakdown:rentaResult.breakdown,neto:total-ccss-renta,satHours:sat,sunHours:sun,amountSat:gSat,amountSun:gSun};
+}
+
+/* ── LOGIN DEMO ── */
+window.demoLogin=function(role){
+  DB=loadDB();
+  if(role==='admin'){
+    currentUser={id:'admin-demo',fullName:'Administradora Demo',email:'admin@gestionamas-demo.com',role:'admin'};
+  }else{
+    const t=DB.users[0];
+    currentUser={id:t.id,fullName:t.fullName,email:t.email,role:'tech'};
+  }
+  showApp();
+};
+document.getElementById('logout-btn').addEventListener('click',()=>{
+  currentUser=null;
+  document.getElementById('app-view').classList.add('hidden');
+  document.getElementById('login-view').classList.remove('hidden');
+});
+function showApp(){
+  document.getElementById('login-view').classList.add('hidden');
+  document.getElementById('app-view').classList.remove('hidden');
+  document.getElementById('user-display-name').textContent=`${currentUser.fullName} · ${currentUser.role==='admin'?'Admin':'Técnico'}`;
+  document.getElementById('user-avatar-initial').textContent=(currentUser.fullName||'U').charAt(0).toUpperCase();
+  if(currentUser.role==='admin'){
+    document.getElementById('admin-panel').classList.remove('hidden');
+    document.getElementById('technician-panel').classList.add('hidden');
+    loadAdminData();
+  }else{
+    document.getElementById('technician-panel').classList.remove('hidden');
+    document.getElementById('admin-panel').classList.add('hidden');
+    loadTechData();
+  }
+}
+
+/* ── TECH DATA ── */
+function loadTechData(){
+  const recs=DB.records.filter(r=>r.userId===currentUser.id);
+  const hours=recs.filter(r=>r.type==='hour').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let pendH=0,rowsH='';
+  hours.forEach(h=>{
+    const paid=h.status==='paid';
+    if(!paid)pendH+=parseFloat(h.extra);
+    rowsH+=`<tr><td>${fmtDate(h.date)}</td><td>${h.client}</td><td>${h.startTime}</td><td>${h.endTime}</td><td>${h.total}h</td><td>${h.extra}h</td>
+    <td><span class="badge ${paid?'badge-paid':'badge-pending'}">${paid?'Pagado':'Pendiente'}</span></td>
+    <td class="actions-cell">
+      ${!paid?`<button type="button" class="btn btn-sm btn-warning" onclick="window.openEditModal('hour','${h.id}')">Editar</button>`:''}
+      ${!paid?`<button type="button" class="btn btn-sm btn-danger" onclick="window.openDeleteConfirm('hour','${h.id}')">Eliminar</button>`:''}
+    </td></tr>`;
+  });
+  document.querySelector('#tech-hours-table tbody').innerHTML=rowsH||`<tr><td colspan="8"><div class="empty-state"><div class="icon">⏱</div><p>Sin registros</p></div></td></tr>`;
+  document.getElementById('tech-pending-hours').textContent=pendH.toFixed(1);
+
+  const exps=recs.filter(r=>r.type==='expense').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let pendE=0,rowsE='';
+  exps.forEach(ex=>{
+    const paid=ex.status==='paid';
+    if(!paid)pendE+=parseFloat(ex.amount);
+    rowsE+=`<tr><td>${fmtDate(ex.date)}</td><td>${ex.invoiceNum}</td><td>${ex.client||'—'}</td>
+    <td><span style="background:var(--navy-50);border:1px solid var(--border);border-radius:4px;padding:.15rem .45rem;font-size:.72rem;font-weight:600">${ex.expenseType||'—'}</span></td>
+    <td>${ex.store}</td><td>${fmt(ex.amount)}</td>
+    <td><span class="badge ${paid?'badge-paid':'badge-pending'}">${paid?'Pagado':'Pendiente'}</span></td>
+    <td class="actions-cell">
+      ${!paid?`<button type="button" class="btn btn-sm btn-warning" onclick="window.openEditModal('expense','${ex.id}')">Editar</button>`:''}
+      ${!paid?`<button type="button" class="btn btn-sm btn-danger" onclick="window.openDeleteConfirm('expense','${ex.id}')">Eliminar</button>`:''}
+    </td></tr>`;
+  });
+  document.querySelector('#tech-expenses-table tbody').innerHTML=rowsE||`<tr><td colspan="8"><div class="empty-state"><div class="icon">🧾</div><p>Sin registros</p></div></td></tr>`;
+  document.getElementById('tech-pending-expenses').textContent=fmt(pendE);
+
+  const u=DB.users.find(x=>x.id===currentUser.id);
+  const vacDays=u?(u.vacationDays||0):0;
+  document.getElementById('tech-vac-days').textContent=Number.isInteger(vacDays)?vacDays:vacDays.toFixed(1);
+
+  loadTechVacations();
+  renderTechProfile();
+}
+function loadTechVacations(){
+  const vacRecs=DB.vacationRequests.filter(v=>v.userId===currentUser.id).sort((a,b)=>new Date(b.requestedAt)-new Date(a.requestedAt));
+  let rows='';
+  vacRecs.forEach(v=>{
+    const statusMap={pending:['badge-pending','Pendiente'],approved:['badge-approved','Aprobada'],cancelled:['badge-cancelled','Cancelada']};
+    const[cls,lbl]=statusMap[v.status]||['badge-pending','Pendiente'];
+    const canCancel=v.status==='pending';
+    rows+=`<tr>
+      <td>${fmtDate(v.requestedAt?v.requestedAt.split('T')[0]:'')}</td>
+      <td>${fmtDate(v.fromDate)}</td><td>${fmtDate(v.toDate)}</td>
+      <td style="text-align:center;font-weight:600">${v.isHalf?`<span style="color:var(--amber);font-size:.8rem">🌗 ½ ${v.halfPeriod||'AM'}</span>`:v.days}</td>
+      <td style="font-size:.78rem;color:var(--text-3)">${v.reason||'—'}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td class="actions-cell">
+        ${v.status==='approved'?`<button type="button" class="btn btn-sm btn-secondary" onclick="window.printVacationSlip('${v.id}')">Boleta</button>`:''}
+        ${canCancel?`<button type="button" class="btn btn-sm btn-danger" onclick="window.cancelVacRequest('${v.id}')">Cancelar</button>`:''}
+      </td>
+    </tr>`;
+  });
+  document.querySelector('#tech-vac-table tbody').innerHTML=rows||`<tr><td colspan="7"><div class="empty-state"><div class="icon">🏖️</div><p>Sin solicitudes de vacaciones</p></div></td></tr>`;
+}
+window.cancelVacRequest=function(id){
+  if(!confirm('¿Cancelar esta solicitud de vacaciones?'))return;
+  const v=DB.vacationRequests.find(x=>x.id===id);
+  if(!v)return;
+  if(v.status==='approved'){
+    const u=DB.users.find(x=>x.id===v.userId);
+    if(u)u.vacationDays=Math.round(((u.vacationDays||0)+v.days)*100)/100;
+  }
+  v.status='cancelled';v.cancelledAt=new Date().toISOString();
+  saveDB();loadTechData();
+  showToast('Solicitud cancelada. Los días han sido restituidos.','success');
+};
+
+/* ── MI PERFIL / CAMBIO DE CORREO (demo) ── */
+window.renderTechProfile=function(){
+  const emailEl=document.getElementById('profile-current-email');
+  if(emailEl)emailEl.textContent=currentUser.email||'—';
+  const nameEl=document.getElementById('profile-name');
+  if(nameEl)nameEl.textContent=currentUser.fullName||'—';
+  const u=DB.users.find(x=>x.id===currentUser.id);
+  const sdEl=document.getElementById('profile-startdate');
+  if(sdEl)sdEl.textContent=u&&u.startDate?fmtDate(u.startDate):'—';
+  const vdEl=document.getElementById('profile-vacdays');
+  if(vdEl){const d=u?(u.vacationDays||0):0;vdEl.textContent=(Number.isInteger(d)?d:d.toFixed(1))+' días';}
+};
+document.getElementById('change-email-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const newEmail=document.getElementById('ce-new-email').value.trim();
+  if(!newEmail){return;}
+  currentUser.email=newEmail;
+  const u=DB.users.find(x=>x.id===currentUser.id);
+  if(u)u.email=newEmail;
+  saveDB();
+  window.closeModal('modal-change-email');
+  window.renderTechProfile();
+  showToast('Correo actualizado (simulado en modo demo).','success');
+});
+
+/* ── EDIT / DELETE RECORDS (tech) ── */
+window.openEditModal=function(type,id){
+  const mid=type==='hour'?'modal-hour':'modal-expense';
+  window.openModal(mid);
+  const r=DB.records.find(x=>x.id===id);
+  if(!r)return;
+  if(type==='hour'){
+    document.getElementById('hour-id').value=id;
+    document.getElementById('hour-client').value=r.client;
+    document.getElementById('hour-date').value=r.date;
+    document.getElementById('hour-start').value=r.startTime;
+    document.getElementById('hour-end').value=r.endTime;
+    document.getElementById('hour-modal-title').textContent='Editar Hora Extra';
+  }else{
+    document.getElementById('expense-id').value=id;
+    document.getElementById('exp-date').value=r.date;
+    document.getElementById('exp-invoice').value=r.invoiceNum;
+    document.getElementById('exp-client').value=r.client||'';
+    document.getElementById('exp-store').value=r.store;
+    document.getElementById('exp-amount').value=r.amount;
+    document.getElementById('exp-desc').value=r.description||'';
+    const rawType=r.expenseType||'';
+    if(rawType.startsWith('Otros: ')){
+      document.getElementById('exp-type').value='Otros';
+      document.getElementById('exp-otros-detail').value=rawType.replace('Otros: ','');
+      document.getElementById('otros-field-wrap').classList.remove('hidden');
+    }else{
+      document.getElementById('exp-type').value=rawType;
+      document.getElementById('otros-field-wrap').classList.add('hidden');
+    }
+    document.getElementById('expense-modal-title').textContent='Editar Gasto';
+  }
+};
+window.openDeleteConfirm=function(type,id){pendingDelete={type,id};document.getElementById('modal-confirm-delete').classList.remove('hidden');};
+window.cancelDelete=function(){document.getElementById('modal-confirm-delete').classList.add('hidden');pendingDelete={type:null,id:null};};
+window.confirmDeleteAction=function(){
+  if(!pendingDelete.id)return;
+  DB.records=DB.records.filter(r=>r.id!==pendingDelete.id);
+  saveDB();
+  if(currentUser.role==='tech')loadTechData();else{window.renderValidationTable();}
+  showToast('Registro eliminado','success');
+  window.cancelDelete();
+};
+
+document.getElementById('hour-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=document.getElementById('hour-id').value;
+  const date=document.getElementById('hour-date').value;
+  const start=document.getElementById('hour-start').value;
+  const end=document.getElementById('hour-end').value;
+  const client=document.getElementById('hour-client').value;
+  const calc=calcTime(date,start,end);
+  if(id){
+    const r=DB.records.find(x=>x.id===id);
+    Object.assign(r,{date,startTime:start,endTime:end,client,total:calc.total,regular:calc.regular,extra:calc.extra});
+  }else{
+    DB.records.push({id:uid('rec'),type:'hour',userId:currentUser.id,date,startTime:start,endTime:end,client,total:calc.total,regular:calc.regular,extra:calc.extra,status:'pending'});
+  }
+  saveDB();loadTechData();window.closeModal('modal-hour');showToast('Guardado exitosamente','success');
+});
+document.getElementById('expense-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=document.getElementById('expense-id').value;
+  const expenseType=(()=>{
+    const t=document.getElementById('exp-type').value;
+    if(t==='Otros'){const d=document.getElementById('exp-otros-detail').value.trim();return d?`Otros: ${d}`:'Otros';}
+    return t;
+  })();
+  const data={type:'expense',userId:currentUser.id,
+    invoiceNum:document.getElementById('exp-invoice').value,
+    client:document.getElementById('exp-client').value||'',
+    store:document.getElementById('exp-store').value,
+    description:document.getElementById('exp-desc').value||'',
+    amount:document.getElementById('exp-amount').value,
+    date:document.getElementById('exp-date').value,
+    expenseType};
+  if(id){const r=DB.records.find(x=>x.id===id);Object.assign(r,data);}
+  else{DB.records.push({id:uid('rec'),status:'pending',...data});}
+  saveDB();loadTechData();window.closeModal('modal-expense');showToast('Guardado exitosamente','success');
+});
+window.toggleOtrosField=function(val){
+  const wrap=document.getElementById('otros-field-wrap');
+  const input=document.getElementById('exp-otros-detail');
+  if(val==='Otros'){wrap.classList.remove('hidden');input.required=true;}
+  else{wrap.classList.add('hidden');input.required=false;input.value='';}
+};
+
+/* ── VACATION REQUEST (tech) ── */
+window.setVacType=function(type){
+  document.getElementById('vac-type').value=type;
+  const fullSec=document.getElementById('vac-full-section'),halfSec=document.getElementById('vac-half-section');
+  const btnFull=document.getElementById('vac-type-full'),btnHalf=document.getElementById('vac-type-half');
+  const active='flex:1;padding:.55rem;border-radius:var(--r-sm);border:2px solid var(--navy-800);background:var(--navy-800);color:#fff;font-weight:600;font-size:.82rem;cursor:pointer';
+  const inactive='flex:1;padding:.55rem;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-weight:600;font-size:.82rem;cursor:pointer';
+  if(type==='full'){fullSec.style.display='';halfSec.style.display='none';btnFull.style.cssText=active;btnHalf.style.cssText=inactive;}
+  else{fullSec.style.display='none';halfSec.style.display='';btnHalf.style.cssText=active;btnFull.style.cssText=inactive;}
+  window.calcVacDays();
+};
+window.setHalfPeriod=function(period){
+  document.getElementById('vac-half-period').value=period;
+  const active='flex:1;padding:.45rem;border-radius:var(--r-sm);border:2px solid var(--navy-800);background:var(--navy-800);color:#fff;font-size:.82rem;cursor:pointer;font-weight:600';
+  const inactive='flex:1;padding:.45rem;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:.82rem;cursor:pointer;font-weight:600';
+  document.getElementById('vac-half-am').style.cssText=period==='AM'?active:inactive;
+  document.getElementById('vac-half-pm').style.cssText=period==='PM'?active:inactive;
+};
+window.calcVacDays=function(){
+  const type=document.getElementById('vac-type')?.value||'full';
+  const preview=document.getElementById('vac-days-preview');
+  if(type==='half'){
+    const date=document.getElementById('vac-half-date')?.value;
+    const period=document.getElementById('vac-half-period')?.value||'AM';
+    if(date){
+      const day=new Date(date+'T00:00:00').getDay();
+      preview.classList.remove('hidden');
+      if(day===0||day===6)preview.innerHTML=`<span style="color:var(--red)">⚠️ Fin de semana. Elija un día hábil.</span>`;
+      else preview.innerHTML=`<strong>🌗 Medio día (${period==='AM'?'Mañana':'Tarde'}) — 0.5 días hábiles</strong>`;
+    }else preview.classList.add('hidden');
+  }else{
+    const f=document.getElementById('vac-from')?.value,t=document.getElementById('vac-to')?.value;
+    if(f&&t&&t>=f){const d=countWorkDays(f,t);preview.classList.remove('hidden');preview.innerHTML=`<strong>📅 Días hábiles solicitados: ${d}</strong>`;}
+    else preview.classList.add('hidden');
+  }
+};
+document.getElementById('vac-request-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const type=document.getElementById('vac-type').value;
+  const reason=document.getElementById('vac-reason').value;
+  let from,to,days,halfPeriod=null,isHalf=false;
+  if(type==='half'){
+    const date=document.getElementById('vac-half-date').value;
+    halfPeriod=document.getElementById('vac-half-period').value;
+    if(!date){showToast('Seleccione una fecha','error');return;}
+    const day=new Date(date+'T00:00:00').getDay();
+    if(day===0||day===6){showToast('Seleccione un día hábil','error');return;}
+    from=date;to=date;days=0.5;isHalf=true;
+  }else{
+    from=document.getElementById('vac-from').value;to=document.getElementById('vac-to').value;
+    if(!from||!to||to<from){showToast('Fechas inválidas','error');return;}
+    days=countWorkDays(from,to);
+    if(days<=0){showToast('El rango no contiene días hábiles','error');return;}
+  }
+  const u=DB.users.find(x=>x.id===currentUser.id);
+  const available=u?(u.vacationDays||0):0;
+  if(days>available){showToast(`No tiene suficientes días. Disponibles: ${available}. Solicitados: ${days}`,'error');return;}
+  DB.vacationRequests.push({id:uid('vac'),userId:currentUser.id,userName:currentUser.fullName,fromDate:from,toDate:to,days,reason,isHalf,halfPeriod,status:'pending',requestedAt:new Date().toISOString()});
+  saveDB();
+  window.closeModal('modal-vac-request');loadTechData();
+  showToast('Solicitud enviada. El administrador la revisará.','success');
+});
+
+/* ── MODAL HELPERS ── */
+window.openModal=function(id){
+  document.getElementById(id).classList.remove('hidden');
+  const form=document.getElementById(id)?.querySelector('form');
+  if(form){form.reset();const h=form.querySelector('input[type="hidden"]');if(h)h.value='';}
+  if(id==='modal-hour')document.getElementById('hour-modal-title').textContent='Registro de Horas';
+  if(id==='modal-expense'){
+    document.getElementById('expense-modal-title').textContent='Registro de Gastos';
+    document.getElementById('otros-field-wrap').classList.add('hidden');
+  }
+  if(id==='modal-change-email')document.getElementById('ce-new-email').value='';
+  if(id==='modal-vac-request'){
+    document.getElementById('vac-days-preview').classList.add('hidden');
+    window.setVacType('full');window.setHalfPeriod('AM');
+    const u=DB.users.find(x=>x.id===currentUser.id);
+    const days=u?(u.vacationDays||0):0;
+    document.getElementById('vac-request-info').innerHTML=`Saldo disponible: <strong>${Number.isInteger(days)?days:days.toFixed(1)} días</strong> (1 día = 1.0 | medio día = 0.5)`;
+  }
+};
+window.closeModal=function(id){document.getElementById(id).classList.add('hidden');};
+
+/* ── PRINT: BOLETA DE VACACIONES ── */
+window.printVacationSlip=function(vacId){
+  const v=DB.vacationRequests.find(x=>x.id===vacId);
+  if(!v)return;
+  const u=DB.users.find(x=>x.id===v.userId)||{fullName:v.userName||'—'};
+  const remainingDays=u.vacationDays||0;
+  const container=document.getElementById('print-tables-container');
+  document.getElementById('print-doc-type').textContent='BOLETA DE VACACIONES';
+  document.getElementById('print-tech-name').textContent=u.fullName;
+  document.getElementById('print-date').textContent='Fecha Emisión: '+new Date().toLocaleDateString();
+  document.getElementById('print-period-text').textContent=`${fmtDate(v.fromDate)} al ${fmtDate(v.toDate)}`;
+  document.getElementById('print-vacation-days').textContent=`${Number.isInteger(remainingDays)?remainingDays:remainingDays.toFixed(1)} días`;
+  document.querySelector('.pdf-col-info:nth-child(3)').style.display='block';
+  document.querySelector('.pdf-col-info:nth-child(4)').style.display='none';
+  container.innerHTML=`
+    <div class="vac-box">
+      <div class="vac-title">SOLICITUD DE VACACIONES — APROBADA</div>
+      <div class="vac-row"><div><strong>Empleado</strong>${u.fullName}</div><div><strong>Fecha Solicitud</strong>${fmtDate(v.requestedAt?v.requestedAt.split('T')[0]:'')}</div></div>
+      <div class="vac-row"><div><strong>Fecha Inicio</strong>${fmtDate(v.fromDate)}</div><div><strong>Fecha Fin</strong>${fmtDate(v.toDate)}</div></div>
+      <div class="vac-row"><div><strong>${v.isHalf?'Tipo':'Días Hábiles'}</strong><span style="font-size:18px;font-weight:bold">${v.isHalf?`🌗 Medio día — ${v.halfPeriod==='AM'?'Mañana (AM)':'Tarde (PM)'}`:v.days}</span></div><div><strong>Motivo</strong>${v.reason||'—'}</div></div>
+      <div class="vac-row"><div><strong>Estado</strong><span style="color:#1d7a4f;font-weight:bold">APROBADA</span></div><div><strong>Aprobado por</strong>${v.approvedBy||'Administrador'}</div></div>
+    </div>
+    <div style="margin-top:70px;display:flex;justify-content:space-between;padding:0 40px">
+      <div style="width:42%;text-align:center;"><div style="border-top:1px solid #000;padding-top:6px;font-size:12px">Colaborador<br><br>___________________<br>${u.fullName}</div></div>
+      <div style="width:42%;text-align:center;"><div style="border-top:1px solid #000;padding-top:6px;font-size:12px">Autorizado<br><br>___________________<br>Gestiona+</div></div>
+    </div>`;
+  document.getElementById('print-final-total').textContent='';
+  document.querySelector('.grand-total').style.display='none';
+  document.getElementById('print-signatures').style.display='none';
+  document.getElementById('app-view').style.display='none';
+  document.getElementById('print-area').style.display='block';
+  window.print();
+  document.getElementById('print-area').style.display='none';
+  document.getElementById('app-view').style.display='block';
+  document.querySelector('.grand-total').style.display='';
+  document.getElementById('print-signatures').style.display='';
+  document.querySelector('.pdf-col-info:nth-child(4)').style.display='block';
+};
+
+/* ── ADMIN: TÉCNICOS ── */
+function loadAdminData(){
+  const tbody=document.getElementById('users-table-body');
+  const fSel=document.getElementById('filter-tech-select');
+  const vFSel=document.getElementById('vac-filter-tech');
+  let html='',opts='<option value="all">Todos</option>';
+  DB.users.forEach(u=>{
+    const vac=u.vacationDays||0,mp=getMonthsDiff(u.startDate),ac=u.vacationCreditedMonths||0;
+    if(mp>ac){u.vacationDays=vac+(mp-ac);u.vacationCreditedMonths=mp;}
+    html+=`<tr>
+      <td style="font-weight:600;color:var(--text-1)">${u.fullName}</td>
+      <td>${fmt(u.salary)}</td>
+      <td style="text-align:center">${Number.isInteger(u.vacationDays)?u.vacationDays:u.vacationDays.toFixed(1)} días</td>
+      <td style="text-align:center">${u.startDate?fmtDate(u.startDate):'-'}</td>
+      <td style="color:var(--text-3);font-size:.78rem">${u.email}</td>
+      <td class="actions-cell">
+        <button type="button" class="btn btn-sm btn-warning" onclick="window.openTechEditModal('${u.id}')">Editar</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="window.deleteUser('${u.id}')">Eliminar</button>
+      </td></tr>`;
+    opts+=`<option value="${u.id}">${u.fullName}</option>`;
+  });
+  tbody.innerHTML=html||`<tr><td colspan="6"><div class="empty-state"><div class="icon">👥</div><p>Sin técnicos</p></div></td></tr>`;
+  fSel.innerHTML=opts;if(vFSel)vFSel.innerHTML=opts;
+  saveDB();
+  renderDeletedUsers();
+}
+document.getElementById('create-user-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=document.getElementById('new-fullname').value;
+  const email=document.getElementById('new-email').value;
+  const salary=document.getElementById('new-salary').value;
+  const startDate=document.getElementById('new-start-date').value;
+  const vac=parseFloat(document.getElementById('new-vacation-days').value)||0;
+  DB.users.push({id:uid('u'),fullName:name,email,salary:parseFloat(salary),startDate,vacationDays:vac,vacationCreditedMonths:getMonthsDiff(startDate)});
+  saveDB();showToast('Técnico creado exitosamente','success');e.target.reset();loadAdminData();
+});
+window.openTechEditModal=function(id){
+  const u=DB.users.find(x=>x.id===id);
+  if(!u)return;
+  window.openModal('modal-tech-edit');
+  document.getElementById('edit-tech-id').value=id;
+  document.getElementById('edit-tech-fullname').value=u.fullName||'';
+  document.getElementById('edit-tech-salary').value=u.salary||'';
+  document.getElementById('edit-start-date').value=u.startDate||'';
+  document.getElementById('edit-vacation-days').value=u.vacationDays||0;
+};
+document.getElementById('tech-edit-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const uid_=document.getElementById('edit-tech-id').value;
+  const u=DB.users.find(x=>x.id===uid_);
+  if(!u)return;
+  u.fullName=document.getElementById('edit-tech-fullname').value.trim();
+  u.salary=parseFloat(document.getElementById('edit-tech-salary').value);
+  u.startDate=document.getElementById('edit-start-date').value;
+  u.vacationDays=parseFloat(document.getElementById('edit-vacation-days').value);
+  saveDB();window.closeModal('modal-tech-edit');loadAdminData();showToast('Perfil actualizado','success');
+});
+window.deleteUser=function(id){
+  const u=DB.users.find(x=>x.id===id);
+  if(!u)return;
+  if(!confirm(`¿Archivar a ${u.fullName}?`))return;
+  DB.deletedUsers.push({...u,deletedAt:new Date().toISOString()});
+  DB.users=DB.users.filter(x=>x.id!==id);
+  saveDB();loadAdminData();
+  showToast(`${u.fullName} archivado correctamente`,'success');
+};
+function renderDeletedUsers(){
+  const empty=document.getElementById('deleted-users-empty'),wrap=document.getElementById('deleted-users-wrap'),tbody=document.getElementById('deleted-users-body');
+  if(!DB.deletedUsers.length){empty.classList.remove('hidden');wrap.style.display='none';return;}
+  empty.classList.add('hidden');wrap.style.display='';
+  tbody.innerHTML=DB.deletedUsers.map(u=>`<tr>
+    <td style="font-weight:600">${u.fullName}</td><td style="color:var(--text-3);font-size:.78rem">${u.email}</td><td>${fmt(u.salary||0)}</td>
+    <td style="font-size:.78rem;color:var(--text-3)">${fmtDate((u.deletedAt||'').split('T')[0])}</td>
+    <td class="actions-cell">
+      <button type="button" class="btn btn-sm btn-success" onclick="window.restoreUser('${u.id}')">↩ Restaurar</button>
+      <button type="button" class="btn btn-sm btn-danger" onclick="window.permanentDeleteUser('${u.id}')">🗑 Borrar</button>
+    </td></tr>`).join('');
+}
+window.restoreUser=function(id){
+  const u=DB.deletedUsers.find(x=>x.id===id);
+  if(!u)return;
+  const{deletedAt,...rest}=u;
+  DB.users.push(rest);
+  DB.deletedUsers=DB.deletedUsers.filter(x=>x.id!==id);
+  saveDB();loadAdminData();showToast(`${u.fullName} restaurado`,'success');
+};
+window.permanentDeleteUser=function(id){
+  if(!confirm('¿Eliminar permanentemente? No se puede deshacer.'))return;
+  DB.deletedUsers=DB.deletedUsers.filter(x=>x.id!==id);
+  saveDB();renderDeletedUsers();showToast('Eliminado permanentemente','success');
+};
+
+/* ── ADMIN: VALIDACIÓN (Planilla) ── */
+window.renderValidationTable=function(){
+  const type=document.getElementById('filter-type-select').value;
+  const tech=document.getElementById('filter-tech-select').value;
+  const sd=document.getElementById('filter-start-date').value;
+  const ed=document.getElementById('filter-end-date').value;
+  const tbody=document.querySelector('#validation-table tbody');
+  const recs=DB.records.filter(r=>{
+    if(type!=='all'&&r.type!==type)return false;
+    if(tech!=='all'&&r.userId!==tech)return false;
+    if(sd&&r.date<sd)return false;
+    if(ed&&r.date>ed)return false;
+    return true;
+  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let rows='';
+  recs.forEach(r=>{
+    const u=DB.users.find(x=>x.id===r.userId);
+    const name=u?u.fullName:'?';
+    const paid=r.status==='paid';
+    let det='',amt='',clientCol='';
+    if(r.type==='hour'){amt=`${r.extra}h extra`;det=`${r.startTime} – ${r.endTime}`;clientCol=r.client||'—';}
+    else{amt=fmt(r.amount);clientCol=r.client||'—';det=`${r.invoiceNum||''}${r.store?' · '+r.store:''}${r.expenseType?' · '+r.expenseType:''}`;}
+    const tbStyle=r.type==='hour'?'background:rgba(27,42,74,.07);color:var(--navy-800);border:1px solid rgba(27,42,74,.15)':'background:var(--amber-bg);color:var(--amber);border:1px solid rgba(154,94,16,.18)';
+    const act=paid?`<input type="checkbox" class="pay-check" value="${r.id}"><button type="button" class="btn btn-warning btn-sm" onclick="window.revertToPending('${r.id}')">Revertir</button>`:`<input type="checkbox" class="pay-check" value="${r.id}">`;
+    rows+=`<tr>
+      <td><input type="checkbox" class="row-select" value="${r.id}"></td>
+      <td style="font-weight:600;color:var(--text-1)">${name}</td>
+      <td><span class="badge" style="${tbStyle};padding:.17rem .52rem;border-radius:999px;font-size:.67rem;font-weight:600">${r.type==='hour'?'Hora':'Gasto'}</span></td>
+      <td>${fmtDate(r.date)}</td><td>${clientCol}</td>
+      <td style="font-size:.76rem;color:var(--text-3)">${det}</td>
+      <td style="font-weight:600">${amt}</td>
+      <td><span class="badge ${paid?'badge-paid':'badge-pending'}">${paid?'Pagado':'Pendiente'}</span></td>
+      <td class="actions-cell">${act}</td>
+    </tr>`;
+  });
+  tbody.innerHTML=rows||`<tr><td colspan="9"><div class="empty-state"><div class="icon">📋</div><p>Sin registros con los filtros seleccionados</p></div></td></tr>`;
+};
+window.toggleSelectAllValidation=function(){const m=document.getElementById('select-all-validation');document.querySelectorAll('#validation-table .row-select').forEach(cb=>cb.checked=m.checked);};
+window.revertToPending=function(id){if(!confirm('¿Volver a pendiente?'))return;const r=DB.records.find(x=>x.id===id);if(r)r.status='pending';saveDB();window.renderValidationTable();};
+window.markSelectedAsPaid=function(){
+  const cbs=document.querySelectorAll('#validation-table .pay-check:checked');
+  if(!cbs.length){showToast('Selecciona registros primero','warning');return;}
+  const ids=Array.from(cbs).map(c=>c.value);
+  if(!confirm(`¿Marcar ${ids.length} registro(s) como pagado?`))return;
+  ids.forEach(id=>{const r=DB.records.find(x=>x.id===id);if(r)r.status='paid';});
+  saveDB();window.renderValidationTable();showToast('Procesados exitosamente','success');
+};
+
+/* ── ADMIN: VACACIONES ── */
+window.renderAdminVacTable=function(){
+  const status=document.getElementById('vac-filter-status').value;
+  const tech=document.getElementById('vac-filter-tech').value;
+  const recs=DB.vacationRequests.filter(r=>{
+    if(status!=='all'&&r.status!==status)return false;
+    if(tech!=='all'&&r.userId!==tech)return false;
+    return true;
+  }).sort((a,b)=>new Date(b.requestedAt)-new Date(a.requestedAt));
+  const tbody=document.querySelector('#admin-vac-table tbody');
+  let rows='';
+  recs.forEach(v=>{
+    const statusCls={pending:'badge-pending',approved:'badge-approved',cancelled:'badge-cancelled'};
+    const statusLbl={pending:'Pendiente',approved:'Aprobada',cancelled:'Cancelada'};
+    rows+=`<tr>
+      <td style="font-weight:600;color:var(--text-1)">${v.userName||'—'}</td>
+      <td>${fmtDate((v.requestedAt||'').split('T')[0])}</td>
+      <td>${fmtDate(v.fromDate)}</td><td>${fmtDate(v.toDate)}</td>
+      <td style="text-align:center;font-weight:600">${v.isHalf?`<span style="background:rgba(217,119,6,.1);color:var(--amber);border:1px solid rgba(217,119,6,.3);border-radius:4px;padding:.15rem .45rem;font-size:.72rem;font-weight:700">🌗 ${v.halfPeriod||'AM'}</span>`:v.days}</td>
+      <td style="font-size:.78rem;color:var(--text-3)">${v.reason||'—'}</td>
+      <td><span class="badge ${statusCls[v.status]||'badge-pending'}">${statusLbl[v.status]||v.status}</span></td>
+      <td class="actions-cell">
+        ${v.status==='pending'?`<button type="button" class="btn btn-sm btn-success" onclick="window.approveVac('${v.id}')">Aprobar</button>`:''}
+        ${v.status==='pending'?`<button type="button" class="btn btn-sm btn-danger" onclick="window.rejectVac('${v.id}')">Rechazar</button>`:''}
+        ${v.status==='approved'?`<button type="button" class="btn btn-sm btn-secondary" onclick="window.printVacationSlip('${v.id}')">Boleta</button>`:''}
+        ${v.status==='approved'?`<button type="button" class="btn btn-sm btn-warning" onclick="window.revertVac('${v.id}')">Revertir</button>`:''}
+        <button type="button" class="btn btn-sm btn-danger" onclick="window.deleteVacRequest('${v.id}')">Eliminar</button>
+      </td></tr>`;
+  });
+  tbody.innerHTML=rows||`<tr><td colspan="8"><div class="empty-state"><div class="icon">🏖️</div><p>Sin solicitudes</p></div></td></tr>`;
+};
+window.approveVac=function(vacId){
+  const v=DB.vacationRequests.find(x=>x.id===vacId);if(!v)return;
+  const u=DB.users.find(x=>x.id===v.userId);if(!u)return;
+  if(!confirm(`¿Aprobar esta solicitud? Se descontarán ${v.days} días del saldo.`))return;
+  if(v.days>(u.vacationDays||0)){showToast('Saldo insuficiente','error');return;}
+  u.vacationDays=(u.vacationDays||0)-v.days;
+  v.status='approved';v.approvedAt=new Date().toISOString();v.approvedBy=currentUser.fullName;
+  saveDB();loadAdminData();window.renderAdminVacTable();
+  showToast(`Aprobada. Se descontaron ${v.days} días.`,'success');
+};
+window.rejectVac=function(vacId){
+  if(!confirm('¿Rechazar esta solicitud?'))return;
+  const v=DB.vacationRequests.find(x=>x.id===vacId);if(!v)return;
+  v.status='cancelled';v.cancelledAt=new Date().toISOString();v.cancelledBy=currentUser.fullName;
+  saveDB();window.renderAdminVacTable();showToast('Solicitud rechazada.','success');
+};
+window.revertVac=function(vacId){
+  const v=DB.vacationRequests.find(x=>x.id===vacId);if(!v)return;
+  const u=DB.users.find(x=>x.id===v.userId);if(!u)return;
+  if(!confirm(`¿Revertir? Se devolverán ${v.days} días.`))return;
+  u.vacationDays=(u.vacationDays||0)+v.days;
+  v.status='pending';v.revertedAt=new Date().toISOString();
+  saveDB();loadAdminData();window.renderAdminVacTable();
+  showToast(`Revertida. Se devolvieron ${v.days} días.`,'success');
+};
+window.deleteVacRequest=function(vacId){
+  const v=DB.vacationRequests.find(x=>x.id===vacId);if(!v)return;
+  if(!confirm('¿Eliminar este registro de vacaciones?'))return;
+  if(v.status==='approved'){const u=DB.users.find(x=>x.id===v.userId);if(u)u.vacationDays=(u.vacationDays||0)+v.days;}
+  DB.vacationRequests=DB.vacationRequests.filter(x=>x.id!==vacId);
+  saveDB();loadAdminData();window.renderAdminVacTable();showToast('Registro eliminado','success');
+};
+
+/* ── PDF / PRINT (planilla) ── */
+function periodStr(ptype){
+  const now=new Date(),y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0'),d=now.getDate();
+  const dim=new Date(y,now.getMonth()+1,0).getDate();
+  let s,e;
+  if(ptype==='monthly'){s='01';e=String(dim).padStart(2,'0');}
+  else{if(d<=15){s='01';e='15';}else{s='16';e=String(dim).padStart(2,'0');}}
+  return`${s}/${m}/${y} al ${e}/${m}/${y}`;
+}
+window.generateValidationPDF=function(){
+  const idSet=new Set();
+  document.querySelectorAll('#validation-table .row-select:checked').forEach(c=>idSet.add(c.value));
+  document.querySelectorAll('#validation-table .pay-check:checked').forEach(c=>idSet.add(c.value));
+  const tid=document.getElementById('filter-tech-select').value;
+  const ptype=document.getElementById('filter-period-select').value;
+  const ftype=document.getElementById('filter-type-select').value;
+  let list;
+  if(!idSet.size){
+    if(tid==='all'){showToast('Seleccione un técnico o registros específicos','warning');return;}
+    list=[];
+  }else{list=DB.records.filter(r=>idSet.has(r.id));}
+  printRecords(list,ptype,tid,ftype);
+};
+function printRecords(list,ptype,techId,ftype){
+  list=list.slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const exps=list.filter(r=>r.type==='expense');
+  const hrs=list.filter(r=>r.type==='hour');
+  let totE=0;exps.forEach(e=>totE+=parseFloat(e.amount));
+  const isExp=ftype==='expense'||(hrs.length===0&&exps.length>0);
+  let name='Varios',vac=0;
+  if(techId&&techId!=='all'){const u=DB.users.find(x=>x.id===techId);if(u){name=u.fullName;vac=u.vacationDays||0;}}
+  let dtype='',period='',pay=null;
+  if(isExp){
+    dtype='LIQUIDACIÓN DE GASTOS';
+    const sd=document.getElementById('filter-start-date').value,ed=document.getElementById('filter-end-date').value;
+    if(sd&&ed)period=`${fmtDate(sd)} al ${fmtDate(ed)}`;
+    else if(list.length)period=`Del ${fmtDate(list[0].date)} al ${fmtDate(list[list.length-1].date)}`;
+    else{const n=new Date();period=`Mes: ${String(n.getMonth()+1).padStart(2,'0')}/${n.getFullYear()}`;}
+  }else{dtype='VALE DE PAGO';pay=calcPay(techId,hrs,ptype);period=periodStr(ptype);}
+  document.getElementById('print-tech-name').textContent=name;
+  document.getElementById('print-date').textContent='Fecha Emisión: '+new Date().toLocaleDateString();
+  document.getElementById('print-period-text').textContent=period;
+  document.getElementById('print-vacation-days').textContent=`${vac} días`;
+  document.querySelector('.pdf-col-info:nth-child(3)').style.display=isExp?'none':'block';
+  document.getElementById('print-doc-type').textContent=dtype;
+  document.querySelector('.grand-total').style.display='';
+  let html='';
+  if(!isExp){
+    if(hrs.length){
+      let tot=0;hrs.forEach(r=>tot+=parseFloat(r.extra));
+      html+=`<h3 style="margin-top:15px;font-size:16px;border-bottom:2px solid #1B2A4A;padding-bottom:6px;color:#1B2A4A">Detalle Horas Extra</h3>`;
+      html+=`<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10.5px;table-layout:fixed">
+        <thead><tr style="background:#1B2A4A;color:#fff"><th style="padding:6px 5px;text-align:left">Fecha</th><th style="padding:6px 5px;text-align:left">Cliente</th><th style="padding:6px 5px;text-align:center">Día</th><th style="padding:6px 5px;text-align:center">Total</th><th style="padding:6px 5px;text-align:center">Extra</th></tr></thead><tbody>`;
+      hrs.forEach((r,idx)=>{
+        const[y,m,d]=r.date.split('-');const day=new Date(y,m-1,d).getDay();
+        const dn=day===0?'Dom':day===6?'Sáb':'Lun-Vie';
+        const bg=idx%2===0?'#ffffff':'#f5f7fb';
+        html+=`<tr style="background:${bg}"><td style="padding:5px;border-bottom:1px solid #e8ecf2">${fmtDate(r.date)}</td><td style="padding:5px;border-bottom:1px solid #e8ecf2">${r.client}</td><td style="padding:5px;border-bottom:1px solid #e8ecf2;text-align:center">${dn}</td><td style="padding:5px;border-bottom:1px solid #e8ecf2;text-align:center">${r.total}h</td><td style="padding:5px;border-bottom:1px solid #e8ecf2;text-align:center;font-weight:700;color:#1B2A4A">${r.extra}h</td></tr>`;
+      });
+      html+=`</tbody><tfoot><tr style="background:#1B2A4A;color:#fff;font-weight:bold"><td colspan="4" style="padding:6px 5px;text-align:right;font-size:11px">Total Horas Extra:</td><td style="padding:6px 5px;text-align:center">${tot.toFixed(1)}h</td></tr></tfoot></table>`;
+    }
+    if(pay){
+      html+=`<div class="payroll-box"><div class="payroll-title">Desglose de Pago</div>`;
+      html+=`<div class="payroll-row earning"><span>Salario Base ${ptype==='biweekly'?'Quincenal':'Mensual'}:</span><span>${fmt(pay.baseSalary)}</span></div>`;
+      if(pay.amountSun>0)html+=`<div class="payroll-row earning"><span>Horas dobles (Dom):</span><span>${fmt(pay.amountSun)}</span></div>`;
+      if(pay.amountSat>0)html+=`<div class="payroll-row earning"><span>Horas Extra (Sáb/Ord.):</span><span>${fmt(pay.amountSat)}</span></div>`;
+      html+=`<div style="border-top:1px dashed #ccc;margin:5px 0"></div>`;
+      html+=`<div class="payroll-row deduction"><span>CCSS (10.83%):</span><span>-${fmt(pay.ccss)}</span></div>`;
+      html+=`<div class="payroll-row deduction"><span>Renta Estimada:</span><span>-${fmt(pay.renta)}</span></div>`;
+      html+=`<div style="border-top:1px solid #000;margin:5px 0"></div>`;
+      html+=`<div class="payroll-row total" style="color:#1B2A4A"><span>Neto Salario:</span><span>${fmt(pay.neto)}</span></div>`;
+      if(totE>0)html+=`<div class="payroll-row earning" style="margin-top:10px"><span>Reembolso Gastos:</span><span>${fmt(totE)}</span></div>`;
+      html+=`</div>`;
+      if(pay.rentaBreakdown&&pay.rentaBreakdown.length){
+        html+=`<div style="margin-top:10px;border:1px solid #ddd;border-radius:5px;padding:10px 14px;background:#fdfdfd">`;
+        html+=`<div style="font-size:11px;font-weight:bold;color:#1B2A4A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px">Detalle Impuesto de Renta (${ptype==='biweekly'?'tramos quincenales':'tramos mensuales'})</div>`;
+        html+=`<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="background:#f0f3f8"><th style="text-align:left;padding:4px 6px">Tramo</th><th style="text-align:right;padding:4px 6px">Monto Gravado</th><th style="text-align:right;padding:4px 6px">Impuesto</th></tr></thead><tbody>`;
+        pay.rentaBreakdown.forEach(b=>{html+=`<tr><td style="padding:3px 6px;border-bottom:1px solid #eee">${b.label}</td><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:right">${fmt(b.taxable)}</td><td style="padding:3px 6px;border-bottom:1px solid #eee;text-align:right;font-weight:bold">${fmt(b.tax)}</td></tr>`;});
+        html+=`</tbody><tfoot><tr style="font-weight:bold"><td colspan="2" style="padding:4px 6px;text-align:right">Total Renta:</td><td style="padding:4px 6px;text-align:right;color:#c0272d">${fmt(pay.renta)}</td></tr></tfoot></table></div>`;
+      }
+    }
+  }
+  if(exps.length){
+    html+=`<h3 style="margin-top:20px;font-size:16px;border-bottom:2px solid #1B2A4A;padding-bottom:6px;color:#1B2A4A;margin-bottom:10px">Reembolso de Gastos</h3>`;
+    html+=`<table style="width:100%;border-collapse:collapse;margin-bottom:16px;font-size:12px;table-layout:fixed">
+      <thead><tr style="background:#1B2A4A;color:#fff"><th style="padding:10px 14px;text-align:left;font-size:11px">Fecha</th><th style="padding:10px 14px;text-align:left;font-size:11px">Factura #</th><th style="padding:10px 14px;text-align:left;font-size:11px">Cliente/Tipo</th><th style="padding:10px 14px;text-align:left;font-size:11px">Comercio/Descripción</th><th style="padding:10px 14px;text-align:right;font-size:11px">Monto</th></tr></thead><tbody>`;
+    exps.forEach((r,idx)=>{
+      const raw=r.expenseType||'—';
+      const rowBg=idx%2===0?'#ffffff':'#f5f7fb';
+      html+=`<tr style="background:${rowBg}"><td style="padding:9px 14px;border-bottom:1px solid #e8ecf2">${fmtDate(r.date)}</td><td style="padding:9px 14px;border-bottom:1px solid #e8ecf2">${r.invoiceNum||'—'}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e8ecf2"><span style="font-weight:700;color:#1B2A4A">${r.client||'—'}</span><br><span style="font-size:11px;color:#555">${raw}</span></td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e8ecf2"><span style="font-weight:600">${r.store||'—'}</span>${r.description?`<br><span style="font-size:11px;color:#777">${r.description}</span>`:''}</td>
+      <td style="padding:9px 14px;border-bottom:1px solid #e8ecf2;text-align:right;font-weight:700">${fmt(r.amount)}</td></tr>`;
+    });
+    html+=`</tbody><tfoot><tr style="background:#1B2A4A;color:#fff;font-weight:bold"><td colspan="4" style="padding:9px 14px;text-align:right;font-size:12px">TOTAL GASTOS:</td><td style="padding:9px 14px;text-align:right;font-size:12px">${fmt(totE)}</td></tr></tfoot></table>`;
+    const LIM=200000;
+    html+=`<div class="petty-cash-box"><div class="petty-cash-header">Resumen Caja Chica (Límite: ₡200,000)</div>`;
+    if(totE<=LIM)html+=`<div class="petty-cash-row"><span>Saldo Restante:</span><span class="petty-cash-ok">${fmt(LIM-totE)}</span></div>`;
+    else{const exc=totE-LIM;html+=`<div class="petty-cash-row"><span>Fondo Utilizado:</span><span>₡200,000.00</span></div><div class="petty-cash-row" style="margin-top:5px;border-top:1px solid #eee;padding-top:5px"><span style="font-weight:bold">Excedente:</span><span class="petty-cash-excess">${fmt(exc)}</span></div>`;}
+    html+=`</div>`;
+  }
+  document.getElementById('print-tables-container').innerHTML=html;
+  let ft=0;
+  if(isExp)ft=totE;else{if(pay)ft=parseFloat(pay.neto);ft+=totE;}
+  document.getElementById('print-final-total').textContent=fmt(ft);
+  document.getElementById('app-view').style.display='none';
+  document.getElementById('print-area').style.display='block';
+  window.print();
+  document.getElementById('print-area').style.display='none';
+  document.getElementById('app-view').style.display='block';
+}
+
+/* ── ESTADÍSTICAS ── */
+const TECH_COLORS=['#1B2A4A','#c0272d','#2563eb','#0891b2','#7c3aed','#b45309','#065f46','#9f1239','#d97706','#374151'];
+let statsCharts={};
+function destroyChart(id){if(statsCharts[id]){statsCharts[id].destroy();delete statsCharts[id];}}
+function initStatsYearSelector(){
+  const sel=document.getElementById('stats-year');
+  if(!sel||sel.options.length>0)return;
+  const now=new Date().getFullYear();
+  for(let y=now;y>=now-4;y--){const o=document.createElement('option');o.value=y;o.textContent=y;sel.appendChild(o);}
+}
+function chartDefaults(){
+  return{responsive:true,maintainAspectRatio:false,animation:{duration:600,easing:'easeInOutQuart'},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1B2A4A',titleColor:'#e2e8f4',bodyColor:'#9bacc8',borderColor:'#2e4270',borderWidth:1,padding:10,cornerRadius:8}},
+    scales:{x:{grid:{display:false},ticks:{font:{size:11},color:'#8896b0',maxRotation:0}},y:{grid:{color:'#f0f3f8'},ticks:{font:{size:11},color:'#8896b0'}}}};
+}
+function donutDefaults(fmtFn,labels){
+  return{responsive:true,maintainAspectRatio:false,cutout:'68%',animation:{duration:700,easing:'easeInOutQuart'},
+    plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},color:'#4a5878',boxWidth:10,boxHeight:10,padding:12,usePointStyle:true}},
+    tooltip:{backgroundColor:'#1B2A4A',titleColor:'#e2e8f4',bodyColor:'#9bacc8',borderColor:'#2e4270',borderWidth:1,padding:10,cornerRadius:8,
+      callbacks:{label:ctx=>{const total=ctx.dataset.data.reduce((a,b)=>a+b,0);const pct=total>0?((ctx.raw/total)*100).toFixed(1):'0.0';return ` ${ctx.label}: ${fmtFn(ctx.raw)} (${pct}%)`;}}}}};
+}
+function fmtCLP(n){return '₡'+Math.round(n).toLocaleString('es-CR');}
+window.loadStats=function(){
+  const year=parseInt(document.getElementById('stats-year').value);
+  const month=document.getElementById('stats-month').value;
+  const filtered=DB.records.filter(r=>{
+    if(!r.date)return false;
+    const[y,m]=r.date.split('-').map(Number);
+    if(y!==year)return false;
+    if(month!=='all'&&m!==parseInt(month))return false;
+    return true;
+  });
+  const expenses=filtered.filter(r=>r.type==='expense');
+  const hours=filtered.filter(r=>r.type==='hour');
+  const hasData=filtered.length>0;
+  document.getElementById('stats-empty').classList.toggle('hidden',hasData);
+  let months,monthLabels;
+  if(month==='all'){months=[1,2,3,4,5,6,7,8,9,10,11,12];monthLabels=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic'];}
+  else{months=[parseInt(month)];monthLabels=[['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Set','Oct','Nov','Dic'][parseInt(month)-1]];}
+  const techsWithData=DB.users.filter(u=>filtered.some(r=>r.userId===u.id));
+  function aggregate(recs,valFn){
+    const map={};
+    recs.forEach(r=>{const m=parseInt(r.date.split('-')[1]);if(!map[r.userId])map[r.userId]={};map[r.userId][m]=(map[r.userId][m]||0)+valFn(r);});
+    return map;
+  }
+  const expMap=aggregate(expenses,r=>parseFloat(r.amount||0));
+  const hrsMap=aggregate(hours,r=>parseFloat(r.extra||0));
+  const costMap=aggregate(hours,r=>{
+    const tech=DB.users.find(u=>u.id===r.userId);
+    if(!tech||!tech.salary)return 0;
+    const hr=parseFloat(tech.salary)/240;
+    const day=new Date(r.date+'T00:00:00').getDay();
+    return parseFloat(r.extra||0)*hr*(day===0?2:1.5);
+  });
+  const totalExp=expenses.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const totalHrs=hours.reduce((s,r)=>s+parseFloat(r.extra||0),0);
+  const totalCost=Object.values(costMap).reduce((s,mm)=>s+Object.values(mm).reduce((a,b)=>a+b,0),0);
+  document.getElementById('kpi-expenses').textContent=fmtCLP(totalExp);
+  document.getElementById('kpi-hours').textContent=totalHrs.toFixed(1)+' h';
+  document.getElementById('kpi-extra-cost').textContent=fmtCLP(totalCost);
+  document.getElementById('kpi-techs').textContent=techsWithData.length;
+  const legendEl=document.getElementById('s-legend-global');
+  legendEl.innerHTML=techsWithData.length?techsWithData.map((t,i)=>`<div class="s-legend-item"><div class="s-legend-swatch" style="background:${TECH_COLORS[i%TECH_COLORS.length]}"></div>${t.fullName.split(' ').slice(0,2).join(' ')}</div>`).join(''):'<span style="font-size:.78rem;color:var(--text-3)">Sin datos en este periodo</span>';
+  function buildBar(map,months){
+    return techsWithData.map((tech,idx)=>({label:tech.fullName.split(' ').slice(0,2).join(' '),data:months.map(m=>parseFloat((map[tech.id]?.[m]||0).toFixed(2))),backgroundColor:TECH_COLORS[idx%TECH_COLORS.length],borderColor:TECH_COLORS[idx%TECH_COLORS.length],borderRadius:5,borderSkipped:false}));
+  }
+  function buildLine(map,months){
+    return techsWithData.map((tech,idx)=>({label:tech.fullName.split(' ').slice(0,2).join(' '),data:months.map(m=>parseFloat((map[tech.id]?.[m]||0).toFixed(2))),borderColor:TECH_COLORS[idx%TECH_COLORS.length],backgroundColor:TECH_COLORS[idx%TECH_COLORS.length]+'18',borderWidth:2.5,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:TECH_COLORS[idx%TECH_COLORS.length],pointBorderColor:'#fff',pointBorderWidth:2,fill:true,tension:0.4}));
+  }
+  function totalPerTech(map){return techsWithData.map(t=>Object.values(map[t.id]||{}).reduce((a,b)=>a+b,0));}
+  function makeBarOpts(fmtFn){const opts=JSON.parse(JSON.stringify(chartDefaults()));opts.plugins.tooltip.callbacks={label:ctx=>` ${ctx.dataset.label}: ${fmtFn(ctx.raw)}`};opts.scales.y.ticks.callback=v=>fmtFn(v);return opts;}
+  function makeLineOpts(fmtFn){const opts=makeBarOpts(fmtFn);opts.interaction={mode:'index',intersect:false};return opts;}
+  destroyChart('expM');
+  statsCharts['expM']=new Chart(document.getElementById('chart-expenses-monthly'),{type:'bar',data:{labels:monthLabels,datasets:buildBar(expMap,months)},options:makeBarOpts(fmtCLP)});
+  destroyChart('hrsM');
+  statsCharts['hrsM']=new Chart(document.getElementById('chart-hours-monthly'),{type:'line',data:{labels:monthLabels,datasets:buildLine(hrsMap,months)},options:makeLineOpts(v=>v.toFixed(1)+'h')});
+  destroyChart('costM');
+  statsCharts['costM']=new Chart(document.getElementById('chart-cost-monthly'),{type:'bar',data:{labels:monthLabels,datasets:buildBar(costMap,months)},options:makeBarOpts(fmtCLP)});
+  const donutLabels=techsWithData.map(t=>t.fullName.split(' ').slice(0,2).join(' '));
+  const donutColors=techsWithData.map((_,i)=>TECH_COLORS[i%TECH_COLORS.length]);
+  destroyChart('dExp');
+  statsCharts['dExp']=new Chart(document.getElementById('chart-donut-expenses'),{type:'doughnut',data:{labels:donutLabels,datasets:[{data:totalPerTech(expMap),backgroundColor:donutColors,borderWidth:3,borderColor:'#fff',hoverOffset:8}]},options:donutDefaults(fmtCLP,donutLabels)});
+  destroyChart('dCost');
+  statsCharts['dCost']=new Chart(document.getElementById('chart-donut-cost'),{type:'doughnut',data:{labels:donutLabels,datasets:[{data:totalPerTech(costMap),backgroundColor:donutColors,borderWidth:3,borderColor:'#fff',hoverOffset:8}]},options:donutDefaults(fmtCLP,donutLabels)});
+  function renderRanking(containerId,map,fmtFn){
+    const sorted=techsWithData.map(t=>({name:t.fullName,val:Object.values(map[t.id]||{}).reduce((a,b)=>a+b,0)})).sort((a,b)=>b.val-a.val);
+    const max=sorted[0]?.val||1;const rankCls=['r1','r2','r3'];
+    document.getElementById(containerId).innerHTML=sorted.length?sorted.map((t,i)=>`<li><div class="s-rank-num ${rankCls[i]||''}">${i+1}</div><div class="s-rank-info"><div class="s-rank-name">${t.name.split(' ').slice(0,2).join(' ')}</div><div class="s-rank-bar-bg"><div class="s-rank-bar-fill" style="width:${max>0?((t.val/max)*100).toFixed(1):0}%"></div></div></div><div class="s-rank-val">${fmtFn(t.val)}</div></li>`).join(''):'<li style="color:var(--text-3);font-size:.82rem;padding:.5rem 0">Sin datos</li>';
+  }
+  renderRanking('rank-expenses',expMap,fmtCLP);
+  renderRanking('rank-hours',hrsMap,v=>v.toFixed(1)+'h');
+  renderRanking('rank-cost',costMap,fmtCLP);
+};
+
+/* ── TABS ── */
+window.switchTab=function(id){
+  document.querySelectorAll('#technician-panel .card').forEach(el=>el.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('#technician-panel .tab-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+};
+window.switchAdminTab=function(id){
+  document.querySelectorAll('#admin-panel .card').forEach(el=>el.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('#admin-panel .tab-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(id==='admin-validation')window.renderValidationTable();
+  if(id==='admin-vacations')window.renderAdminVacTable();
+  if(id==='admin-stats'){initStatsYearSelector();window.loadStats();}
+};
+</script>
+</body>
+</html>
